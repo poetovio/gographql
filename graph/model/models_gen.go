@@ -2,10 +2,21 @@
 
 package model
 
+type Dog struct {
+	ID        string `json:"_id" bson:"_id"`
+	Name      string `json:"name"`
+	IsGoodBoi bool   `json:"isGoodBoi"`
+}
+
 type Kolo struct {
-	ID               string    `json:"_id"`
-	SerijskaStevilka string    `json:"serijska_stevilka"`
-	Mnenje           []*string `json:"mnenje"`
+	ID               string    `json:"_id" bson:"_id"`
+	SerijskaStevilka string    `json:"serijska_stevilka" bson:"serijska_stevilka"`
+	Mnenje           []*string `json:"mnenje" bson:"mnenje"`
+}
+
+type NewDog struct {
+	Name      string `json:"name"`
+	IsGoodBoi bool   `json:"isGoodBoi"`
 }
 
 type NewKolo struct {
@@ -19,11 +30,6 @@ type NewPostajalisce struct {
 	Longitude float64 `json:"longitude"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
 type Postajalisce struct {
 	ID          string  `json:"_id"`
 	Ime         string  `json:"ime"`
@@ -31,16 +37,4 @@ type Postajalisce struct {
 	Latitude    float64 `json:"latitude"`
 	Longitude   float64 `json:"longitude"`
 	KolesaArray []*Kolo `json:"kolesaArray"`
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
 }

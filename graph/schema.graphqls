@@ -2,11 +2,10 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+type Dog {
+  _id: String!
+  name: String!
+  isGoodBoi: Boolean!
 }
 
 type Postajalisce {
@@ -25,23 +24,15 @@ type Kolo {
 }
 
 
-type User {
-  id: ID!
-  name: String!
-}
-
 type Query {
-  todos: [Todo!]!
+  dog(_id: String): Dog!
+  dogs: [Dog!]!
   kolo(_id: String!): Kolo!
   kolesa: [Kolo!]!
   postajalisce(_id: String!): Postajalisce!
   postajalisca: [Postajalisce!]!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
-}
 
 input NewKolo {
   serijska_stevilka: String!
@@ -54,8 +45,13 @@ input NewPostajalisce {
   longitude: Float!
 }
 
+input NewDog {
+  name: String!
+  isGoodBoi: Boolean!
+}
+
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createDog(input: NewDog!): Dog!
   createKolo(input: NewKolo!): Kolo!
   createPostajalisce(input: NewPostajalisce!): Postajalisce!
 }

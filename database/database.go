@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"go-graphql-mongodb-api/graph/model"
 	"log"
 	"time"
@@ -17,6 +16,13 @@ import (
 type DB struct {
 	client *mongo.Client
 }
+
+const (
+	DATABASE     = "projekt"
+	KOLESA       = "kolesa"
+	POSTAJALISCA = "postajalisca"
+	DOGS         = "dogs"
+)
 
 func Connect(url string) *DB {
 	// generates a new client to connect to the deployment
@@ -50,6 +56,8 @@ func Connect(url string) *DB {
 		log.Fatal(err)
 	}
 
+	log.Default().Println("Successfully connected to database!")
+
 	// if the connection is successful, return the DB struct
 	return &DB{
 		client: client,
@@ -58,13 +66,14 @@ func Connect(url string) *DB {
 
 // function for inserting a new Kolo into database
 func (db *DB) InsertKolo(kolo model.NewKolo) *model.Kolo {
-	koloColl := db.client.Database("graphql-mongodb-api-db").Collection("kolo")
+	koloColl := db.client.Database(DATABASE).Collection(KOLESA)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	inserg, err := koloColl.InsertOne(ctx, bson.D{{Key: "serijska_stevilka", Value: kolo.SerijskaStevilka}, {Key: "mnenje", Value: bson.A{}}})
 
 	if err != nil {
+		log.Default().Println("Napaka pri vstavljanju")
 		log.Fatal(err)
 	}
 
@@ -81,24 +90,29 @@ func (db *DB) FindKolo(id string) *model.Kolo {
 		log.Fatal(err)
 	}
 
-	koloColl := db.client.Database("graphql-mongodb-api-db").Collection("kolo")
+	koloColl := db.client.Database(DATABASE).Collection(KOLESA)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	result := koloColl.FindOne(ctx, bson.M{"_id": ObjectID})
 
-	kolo := model.Kolo{ID: id}
+	kolo := model.Kolo{}
 
-	result.Decode(&kolo)
+	err = result.Decode(&kolo)
+
+	log.Default().Println(kolo.ID)
+	log.Default().Println(kolo.Mnenje)
+	log.Default().Println(kolo.SerijskaStevilka)
 
 	return &kolo
 }
 
 // function for finding all Kolo in database
 func (db *DB) FindAllKolo() []*model.Kolo {
-	koloColl := db.client.Database("graphql-mongodb-api-db").Collection("kolo")
+	koloColl := db.client.Database(DATABASE).Collection(KOLESA)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	cursor, err := koloColl.Find(ctx, bson.D{})
 	if err != nil {
 		log.Fatal(err)
@@ -106,16 +120,76 @@ func (db *DB) FindAllKolo() []*model.Kolo {
 
 	var kolesa []*model.Kolo
 	for cursor.Next(ctx) {
-		sus, err := cursor.Current.Elements()
-		fmt.Println(sus)
+		var kolo *model.Kolo
+		err := cursor.Decode(&kolo)
+
 		if err != nil {
+			log.Default().Println("Napaka pri kurzorju")
 			log.Fatal(err)
 		}
 
-		kolo := model.Kolo{ID: sus[0].Value().StringValue(), SerijskaStevilka: sus[1].Value().StringValue(), Mnenje: make([]*string, 500)}
-
-		kolesa = append(kolesa, &kolo)
+		kolesa = append(kolesa, kolo)
 	}
 
 	return kolesa
+}
+
+func (db *DB) InsertDog(input *model.NewDog) *model.Dog {
+	collection := db.client.Database(DATABASE).Collection(KOLESA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := collection.InsertOne(ctx, input)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &model.Dog{
+		ID:        res.InsertedID.(primitive.ObjectID).Hex(),
+		Name:      input.Name,
+		IsGoodBoi: input.IsGoodBoi,
+	}
+}
+
+func (db *DB) FindDog(id string) *model.Dog {
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	collection := db.client.Database(DATABASE).Collection(DOGS)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	res := collection.FindOne(ctx, bson.M{"_id": ObjectID})
+
+	dog := model.Dog{}
+
+	res.Decode(&dog)
+
+	return &dog
+}
+
+func (db *DB) FindAllDog() []*model.Dog {
+	collection := db.client.Database(DATABASE).Collection(DOGS)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var dogs []*model.Dog
+	for cursor.Next(ctx) {
+		var dog *model.Dog
+		err := cursor.Decode(dog)
+		if err != nil {
+			log.Fatal(err)
+		}
+		dogs = append(dogs, dog)
+	}
+
+	return dogs
+
 }
