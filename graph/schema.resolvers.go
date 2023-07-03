@@ -23,7 +23,7 @@ func (r *mutationResolver) CreateKolo(ctx context.Context, input model.NewKolo) 
 
 // CreatePostajalisce is the resolver for the createPostajalisce field.
 func (r *mutationResolver) CreatePostajalisce(ctx context.Context, input model.NewPostajalisce) (*model.Postajalisce, error) {
-	panic(fmt.Errorf("not implemented: CreatePostajalisce - createPostajalisce"))
+	return db.InsertPostajalisce(input), nil
 }
 
 // Dog is the resolver for the dog field.
@@ -48,12 +48,12 @@ func (r *queryResolver) Kolesa(ctx context.Context) ([]*model.Kolo, error) {
 
 // Postajalisce is the resolver for the postajalisce field.
 func (r *queryResolver) Postajalisce(ctx context.Context, id string) (*model.Postajalisce, error) {
-	panic(fmt.Errorf("not implemented: Postajalisce - postajalisce"))
+	return db.FindPostajalisce(id), nil
 }
 
 // Postajalisca is the resolver for the postajalisca field.
 func (r *queryResolver) Postajalisca(ctx context.Context) ([]*model.Postajalisce, error) {
-	panic(fmt.Errorf("not implemented: Postajalisca - postajalisca"))
+	return db.FindAllPostajalisce(), nil
 }
 
 // Mutation returns MutationResolver implementation.

@@ -73,7 +73,7 @@ func (db *DB) InsertKolo(kolo model.NewKolo) *model.Kolo {
 	inserg, err := koloColl.InsertOne(ctx, bson.D{{Key: "serijska_stevilka", Value: kolo.SerijskaStevilka}, {Key: "mnenje", Value: bson.A{}}})
 
 	if err != nil {
-		log.Default().Println("Napaka pri vstavljanju")
+		log.Default().Println("ERROR -> couldn't insert Kolo into database")
 		log.Fatal(err)
 	}
 
@@ -100,9 +100,9 @@ func (db *DB) FindKolo(id string) *model.Kolo {
 
 	err = result.Decode(&kolo)
 
-	log.Default().Println(kolo.ID)
-	log.Default().Println(kolo.Mnenje)
-	log.Default().Println(kolo.SerijskaStevilka)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return &kolo
 }
@@ -132,6 +132,79 @@ func (db *DB) FindAllKolo() []*model.Kolo {
 	}
 
 	return kolesa
+}
+
+// function for inserting a Postajalisce into database
+func (db *DB) InsertPostajalisce(postajalisce model.NewPostajalisce) *model.Postajalisce {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	inserg, err := postajalisceColl.InsertOne(ctx, bson.D{{Key: "ime", Value: postajalisce.Ime}, {Key: "naslov", Value: postajalisce.Naslov},
+		{Key: "latitude", Value: postajalisce.Latitude}, {Key: "longitude", Value: postajalisce.Longitude}, {Key: "kolesaArray", Value: bson.A{}}})
+
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't insert Postajalisce into database.")
+		log.Fatal(err)
+	}
+
+	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
+	returnPostajalisce := model.Postajalisce{ID: insertedID, Ime: postajalisce.Ime, Naslov: postajalisce.Naslov, Latitude: postajalisce.Latitude, Longitude: postajalisce.Longitude, KolesaArray: []*model.Kolo{}}
+
+	return &returnPostajalisce
+}
+
+// function for finding a Postajalisce in database by id
+func (db *DB) FindPostajalisce(id string) *model.Postajalisce {
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
+
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result := postajalisceColl.FindOne(ctx, bson.M{"_id": ObjectID})
+
+	postajalisce := model.Postajalisce{}
+
+	err = result.Decode(&postajalisce)
+
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't decode result into Postajalisce")
+	}
+
+	return &postajalisce
+}
+
+// function for finding all Postajalisce in database
+
+func (db *DB) FindAllPostajalisce() []*model.Postajalisce {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := postajalisceColl.Find(ctx, bson.D{})
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor for Postajalisce")
+		log.Fatal(err)
+	}
+
+	var postajalisca []*model.Postajalisce
+	for cursor.Next(ctx) {
+		var postajalisce *model.Postajalisce
+		err := cursor.Decode(&postajalisce)
+
+		if err != nil {
+			log.Default().Println("ERROR -> couldn't decode result into Postajalisce")
+			log.Fatal(err)
+		}
+
+		postajalisca = append(postajalisca, postajalisce)
+	}
+
+	return postajalisca
 }
 
 func (db *DB) InsertDog(input *model.NewDog) *model.Dog {

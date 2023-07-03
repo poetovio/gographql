@@ -31,10 +31,10 @@ type NewPostajalisce struct {
 }
 
 type Postajalisce struct {
-	ID          string  `json:"_id"`
-	Ime         string  `json:"ime"`
-	Naslov      string  `json:"naslov"`
-	Latitude    float64 `json:"latitude"`
-	Longitude   float64 `json:"longitude"`
-	KolesaArray []*Kolo `json:"kolesaArray"`
+	ID          string  `json:"_id" bson:"_id"`
+	Ime         string  `json:"ime" bson:"ime"`
+	Naslov      string  `json:"naslov" bson:"naslov"`
+	Latitude    float64 `json:"latitude" bson:"latitude"`
+	Longitude   float64 `json:"longitude" bson:"longitude"`
+	KolesaArray []*Kolo `json:"kolesaArray" bson:"kolesaArray"`
 }
