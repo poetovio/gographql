@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"go-graphql-mongodb-api/graph/database"
 	"go-graphql-mongodb-api/graph/model"
 )
 
@@ -17,7 +18,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 // CreateKolo is the resolver for the createKolo field.
 func (r *mutationResolver) CreateKolo(ctx context.Context, input model.NewKolo) (*model.Kolo, error) {
-	panic(fmt.Errorf("not implemented: CreateKolo - createKolo"))
+	return db.InsertKolo(input), nil
 }
 
 // CreatePostajalisce is the resolver for the createPostajalisce field.
@@ -32,12 +33,12 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 
 // Kolo is the resolver for the kolo field.
 func (r *queryResolver) Kolo(ctx context.Context, id string) (*model.Kolo, error) {
-	panic(fmt.Errorf("not implemented: Kolo - kolo"))
+	return db.FindKolo(id), nil
 }
 
 // Kolesa is the resolver for the kolesa field.
 func (r *queryResolver) Kolesa(ctx context.Context) ([]*model.Kolo, error) {
-	panic(fmt.Errorf("not implemented: Kolesa - kolesa"))
+	return db.FindAllKolo(), nil
 }
 
 // Postajalisce is the resolver for the postajalisce field.
@@ -58,3 +59,5 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+var db = database.Connect("mongodb+srv://admin:admin@cluster0.nikbntq.mongodb.net/?retryWrites=true&w=majority")

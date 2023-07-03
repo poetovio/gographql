@@ -1,10 +1,11 @@
 package main
 
 import (
-	"go-graphql-mongodb-api/graph"
 	"log"
 	"net/http"
 	"os"
+
+	"go-graphql-mongodb-api/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
