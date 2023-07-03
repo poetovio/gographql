@@ -15,9 +15,39 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
 }
 
+// CreateKolo is the resolver for the createKolo field.
+func (r *mutationResolver) CreateKolo(ctx context.Context, input model.NewKolo) (*model.Kolo, error) {
+	panic(fmt.Errorf("not implemented: CreateKolo - createKolo"))
+}
+
+// CreatePostajalisce is the resolver for the createPostajalisce field.
+func (r *mutationResolver) CreatePostajalisce(ctx context.Context, input model.NewPostajalisce) (*model.Postajalisce, error) {
+	panic(fmt.Errorf("not implemented: CreatePostajalisce - createPostajalisce"))
+}
+
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	panic(fmt.Errorf("not implemented: Todos - todos"))
+}
+
+// Kolo is the resolver for the kolo field.
+func (r *queryResolver) Kolo(ctx context.Context, id string) (*model.Kolo, error) {
+	panic(fmt.Errorf("not implemented: Kolo - kolo"))
+}
+
+// Kolesa is the resolver for the kolesa field.
+func (r *queryResolver) Kolesa(ctx context.Context) ([]*model.Kolo, error) {
+	panic(fmt.Errorf("not implemented: Kolesa - kolesa"))
+}
+
+// Postajalisce is the resolver for the postajalisce field.
+func (r *queryResolver) Postajalisce(ctx context.Context, id string) (*model.Postajalisce, error) {
+	panic(fmt.Errorf("not implemented: Postajalisce - postajalisce"))
+}
+
+// Postajalisca is the resolver for the postajalisca field.
+func (r *queryResolver) Postajalisca(ctx context.Context) ([]*model.Postajalisce, error) {
+	panic(fmt.Errorf("not implemented: Postajalisca - postajalisca"))
 }
 
 // Mutation returns MutationResolver implementation.

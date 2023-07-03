@@ -2,9 +2,35 @@
 
 package model
 
+type Kolo struct {
+	ID               string    `json:"_id"`
+	SerijskaStevilka string    `json:"serijska_stevilka"`
+	Mnenje           []*string `json:"mnenje"`
+}
+
+type NewKolo struct {
+	SerijskaStevilka string `json:"serijska_stevilka"`
+}
+
+type NewPostajalisce struct {
+	Ime       string  `json:"ime"`
+	Naslov    string  `json:"naslov"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
+}
+
+type Postajalisce struct {
+	ID          string  `json:"_id"`
+	Ime         string  `json:"ime"`
+	Naslov      string  `json:"naslov"`
+	Latitude    float64 `json:"latitude"`
+	Longitude   float64 `json:"longitude"`
+	KolesaArray []*Kolo `json:"kolesaArray"`
 }
 
 type Todo struct {
