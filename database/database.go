@@ -29,6 +29,7 @@ func Connect(url string) *DB {
 	client, err := mongo.NewClient(options.Client().ApplyURI(url))
 
 	if err != nil {
+		log.Default().Println("ERROR -> couldn't create a client")
 		log.Fatal(err)
 	}
 
@@ -38,6 +39,7 @@ func Connect(url string) *DB {
 	err = client.Connect(ctx)
 
 	if err != nil {
+		log.Default().Println("ERROR -> couldn't connect to database")
 		log.Fatal(err)
 	}
 
@@ -45,6 +47,7 @@ func Connect(url string) *DB {
 	err = client.Ping(ctx, readpref.Primary())
 
 	if err != nil {
+		log.Default().Println("ERROR -> couldn't ping to database")
 		log.Fatal(err)
 	}
 
@@ -53,6 +56,7 @@ func Connect(url string) *DB {
 
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
+		log.Default().Println("ERROR -> couldn't ping to database")
 		log.Fatal(err)
 	}
 
@@ -87,6 +91,7 @@ func (db *DB) InsertKolo(kolo model.NewKolo) *model.Kolo {
 func (db *DB) FindKolo(id string) *model.Kolo {
 	ObjectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
 		log.Fatal(err)
 	}
 
@@ -101,6 +106,7 @@ func (db *DB) FindKolo(id string) *model.Kolo {
 	err = result.Decode(&kolo)
 
 	if err != nil {
+		log.Default().Println("ERROR -> couldn't decode object Kolo")
 		log.Fatal(err)
 	}
 
@@ -115,6 +121,7 @@ func (db *DB) FindAllKolo() []*model.Kolo {
 
 	cursor, err := koloColl.Find(ctx, bson.D{})
 	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor on collection Kolesa")
 		log.Fatal(err)
 	}
 
@@ -124,7 +131,7 @@ func (db *DB) FindAllKolo() []*model.Kolo {
 		err := cursor.Decode(&kolo)
 
 		if err != nil {
-			log.Default().Println("Napaka pri kurzorju")
+			log.Default().Println("ERROR -> couldn't decode cursor")
 			log.Fatal(err)
 		}
 
@@ -132,6 +139,34 @@ func (db *DB) FindAllKolo() []*model.Kolo {
 	}
 
 	return kolesa
+}
+
+// function for reserving and releasing a Kolo
+
+func (db *DB) ReserveKolo(id string, reserved bool) *model.Kolo {
+	koloColl := db.client.Database(DATABASE).Collection(KOLESA)
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
+
+	filter := bson.D{{Key: "_id", Value: ObjectID}}
+
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "rezervirano", Value: reserved}}}}
+
+	result, err := koloColl.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't update Kolo")
+		log.Fatal(err)
+	}
+
+	if result.MatchedCount == 0 {
+		log.Default().Println("ERROR -> couldn't find Kolo")
+	}
+
+	return db.FindKolo(id)
 }
 
 // function for inserting a Postajalisce into database
@@ -173,6 +208,7 @@ func (db *DB) FindPostajalisce(id string) *model.Postajalisce {
 
 	if err != nil {
 		log.Default().Println("ERROR -> couldn't decode result into Postajalisce")
+		log.Fatal(err)
 	}
 
 	return &postajalisce
@@ -205,64 +241,4 @@ func (db *DB) FindAllPostajalisce() []*model.Postajalisce {
 	}
 
 	return postajalisca
-}
-
-func (db *DB) InsertDog(input *model.NewDog) *model.Dog {
-	collection := db.client.Database(DATABASE).Collection(KOLESA)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	res, err := collection.InsertOne(ctx, input)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &model.Dog{
-		ID:        res.InsertedID.(primitive.ObjectID).Hex(),
-		Name:      input.Name,
-		IsGoodBoi: input.IsGoodBoi,
-	}
-}
-
-func (db *DB) FindDog(id string) *model.Dog {
-	ObjectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	collection := db.client.Database(DATABASE).Collection(DOGS)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	res := collection.FindOne(ctx, bson.M{"_id": ObjectID})
-
-	dog := model.Dog{}
-
-	res.Decode(&dog)
-
-	return &dog
-}
-
-func (db *DB) FindAllDog() []*model.Dog {
-	collection := db.client.Database(DATABASE).Collection(DOGS)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	cursor, err := collection.Find(ctx, bson.D{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var dogs []*model.Dog
-	for cursor.Next(ctx) {
-		var dog *model.Dog
-		err := cursor.Decode(dog)
-		if err != nil {
-			log.Fatal(err)
-		}
-		dogs = append(dogs, dog)
-	}
-
-	return dogs
-
 }

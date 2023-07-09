@@ -9,7 +9,6 @@ import (
 	"go-graphql-mongodb-api/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/rs/cors"
 )
 
@@ -18,9 +17,10 @@ const mongoString = "mongodb+srv://admin:admin@cluster0.nikbntq.mongodb.net/?ret
 
 func main() {
 	database.Connect(mongoString)
+
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowCredentials: true,
+		AllowCredentials: false,
 	})
 
 	port := os.Getenv("PORT")
@@ -30,9 +30,8 @@ func main() {
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", c.Handler(srv))
+	http.Handle("/", c.Handler(srv))
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Printf("OK -> server is running on port %s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

@@ -45,20 +45,14 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Dog struct {
-		ID        func(childComplexity int) int
-		IsGoodBoi func(childComplexity int) int
-		Name      func(childComplexity int) int
-	}
-
 	Kolo struct {
 		ID               func(childComplexity int) int
 		Mnenje           func(childComplexity int) int
+		Rezervirano      func(childComplexity int) int
 		SerijskaStevilka func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateDog          func(childComplexity int, input model.NewDog) int
 		CreateKolo         func(childComplexity int, input model.NewKolo) int
 		CreatePostajalisce func(childComplexity int, input model.NewPostajalisce) int
 	}
@@ -73,23 +67,22 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Dog          func(childComplexity int, id *string) int
-		Dogs         func(childComplexity int) int
-		Kolesa       func(childComplexity int) int
-		Kolo         func(childComplexity int, id string) int
-		Postajalisca func(childComplexity int) int
-		Postajalisce func(childComplexity int, id string) int
+		Kolesa        func(childComplexity int) int
+		Kolo          func(childComplexity int, id string) int
+		Postajalisca  func(childComplexity int) int
+		Postajalisce  func(childComplexity int, id string) int
+		ReserveKolo   func(childComplexity int, id string) int
+		UnreserveKolo func(childComplexity int, id string) int
 	}
 }
 
 type MutationResolver interface {
-	CreateDog(ctx context.Context, input model.NewDog) (*model.Dog, error)
 	CreateKolo(ctx context.Context, input model.NewKolo) (*model.Kolo, error)
 	CreatePostajalisce(ctx context.Context, input model.NewPostajalisce) (*model.Postajalisce, error)
 }
 type QueryResolver interface {
-	Dog(ctx context.Context, id *string) (*model.Dog, error)
-	Dogs(ctx context.Context) ([]*model.Dog, error)
+	ReserveKolo(ctx context.Context, id string) (*model.Kolo, error)
+	UnreserveKolo(ctx context.Context, id string) (*model.Kolo, error)
 	Kolo(ctx context.Context, id string) (*model.Kolo, error)
 	Kolesa(ctx context.Context) ([]*model.Kolo, error)
 	Postajalisce(ctx context.Context, id string) (*model.Postajalisce, error)
@@ -111,27 +104,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Dog._id":
-		if e.complexity.Dog.ID == nil {
-			break
-		}
-
-		return e.complexity.Dog.ID(childComplexity), true
-
-	case "Dog.isGoodBoi":
-		if e.complexity.Dog.IsGoodBoi == nil {
-			break
-		}
-
-		return e.complexity.Dog.IsGoodBoi(childComplexity), true
-
-	case "Dog.name":
-		if e.complexity.Dog.Name == nil {
-			break
-		}
-
-		return e.complexity.Dog.Name(childComplexity), true
-
 	case "Kolo._id":
 		if e.complexity.Kolo.ID == nil {
 			break
@@ -146,24 +118,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Kolo.Mnenje(childComplexity), true
 
+	case "Kolo.rezervirano":
+		if e.complexity.Kolo.Rezervirano == nil {
+			break
+		}
+
+		return e.complexity.Kolo.Rezervirano(childComplexity), true
+
 	case "Kolo.serijska_stevilka":
 		if e.complexity.Kolo.SerijskaStevilka == nil {
 			break
 		}
 
 		return e.complexity.Kolo.SerijskaStevilka(childComplexity), true
-
-	case "Mutation.createDog":
-		if e.complexity.Mutation.CreateDog == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createDog_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateDog(childComplexity, args["input"].(model.NewDog)), true
 
 	case "Mutation.createKolo":
 		if e.complexity.Mutation.CreateKolo == nil {
@@ -231,25 +198,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Postajalisce.Naslov(childComplexity), true
 
-	case "Query.dog":
-		if e.complexity.Query.Dog == nil {
-			break
-		}
-
-		args, err := ec.field_Query_dog_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Dog(childComplexity, args["_id"].(*string)), true
-
-	case "Query.dogs":
-		if e.complexity.Query.Dogs == nil {
-			break
-		}
-
-		return e.complexity.Query.Dogs(childComplexity), true
-
 	case "Query.kolesa":
 		if e.complexity.Query.Kolesa == nil {
 			break
@@ -288,6 +236,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Postajalisce(childComplexity, args["_id"].(string)), true
 
+	case "Query.reserveKolo":
+		if e.complexity.Query.ReserveKolo == nil {
+			break
+		}
+
+		args, err := ec.field_Query_reserveKolo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ReserveKolo(childComplexity, args["_id"].(string)), true
+
+	case "Query.unreserveKolo":
+		if e.complexity.Query.UnreserveKolo == nil {
+			break
+		}
+
+		args, err := ec.field_Query_unreserveKolo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UnreserveKolo(childComplexity, args["_id"].(string)), true
+
 	}
 	return 0, false
 }
@@ -296,7 +268,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputNewDog,
 		ec.unmarshalInputNewKolo,
 		ec.unmarshalInputNewPostajalisce,
 	)
@@ -415,21 +386,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createDog_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewDog
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewDog2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐNewDog(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createKolo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -475,21 +431,6 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_dog_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["_id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["_id"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_kolo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -506,6 +447,36 @@ func (ec *executionContext) field_Query_kolo_args(ctx context.Context, rawArgs m
 }
 
 func (ec *executionContext) field_Query_postajalisce_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_reserveKolo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_unreserveKolo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -557,138 +528,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _Dog__id(ctx context.Context, field graphql.CollectedField, obj *model.Dog) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dog__id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Dog__id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Dog",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Dog_name(ctx context.Context, field graphql.CollectedField, obj *model.Dog) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dog_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Dog_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Dog",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Dog_isGoodBoi(ctx context.Context, field graphql.CollectedField, obj *model.Dog) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dog_isGoodBoi(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsGoodBoi, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Dog_isGoodBoi(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Dog",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
 
 func (ec *executionContext) _Kolo__id(ctx context.Context, field graphql.CollectedField, obj *model.Kolo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Kolo__id(ctx, field)
@@ -822,8 +661,8 @@ func (ec *executionContext) fieldContext_Kolo_mnenje(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createDog(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createDog(ctx, field)
+func (ec *executionContext) _Kolo_rezervirano(ctx context.Context, field graphql.CollectedField, obj *model.Kolo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Kolo_rezervirano(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -836,7 +675,7 @@ func (ec *executionContext) _Mutation_createDog(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateDog(rctx, fc.Args["input"].(model.NewDog))
+		return obj.Rezervirano, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -848,39 +687,20 @@ func (ec *executionContext) _Mutation_createDog(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Dog)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNDog2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐDog(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createDog(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Kolo_rezervirano(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Mutation",
+		Object:     "Kolo",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "_id":
-				return ec.fieldContext_Dog__id(ctx, field)
-			case "name":
-				return ec.fieldContext_Dog_name(ctx, field)
-			case "isGoodBoi":
-				return ec.fieldContext_Dog_isGoodBoi(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Dog", field.Name)
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createDog_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -930,6 +750,8 @@ func (ec *executionContext) fieldContext_Mutation_createKolo(ctx context.Context
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
+			case "rezervirano":
+				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -1282,6 +1104,8 @@ func (ec *executionContext) fieldContext_Postajalisce_kolesaArray(ctx context.Co
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
+			case "rezervirano":
+				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -1289,8 +1113,8 @@ func (ec *executionContext) fieldContext_Postajalisce_kolesaArray(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_dog(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_dog(ctx, field)
+func (ec *executionContext) _Query_reserveKolo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_reserveKolo(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1303,7 +1127,7 @@ func (ec *executionContext) _Query_dog(ctx context.Context, field graphql.Collec
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Dog(rctx, fc.Args["_id"].(*string))
+		return ec.resolvers.Query().ReserveKolo(rctx, fc.Args["_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1315,12 +1139,12 @@ func (ec *executionContext) _Query_dog(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Dog)
+	res := resTmp.(*model.Kolo)
 	fc.Result = res
-	return ec.marshalNDog2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐDog(ctx, field.Selections, res)
+	return ec.marshalNKolo2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKolo(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_dog(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_reserveKolo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1329,13 +1153,15 @@ func (ec *executionContext) fieldContext_Query_dog(ctx context.Context, field gr
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "_id":
-				return ec.fieldContext_Dog__id(ctx, field)
-			case "name":
-				return ec.fieldContext_Dog_name(ctx, field)
-			case "isGoodBoi":
-				return ec.fieldContext_Dog_isGoodBoi(ctx, field)
+				return ec.fieldContext_Kolo__id(ctx, field)
+			case "serijska_stevilka":
+				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
+			case "mnenje":
+				return ec.fieldContext_Kolo_mnenje(ctx, field)
+			case "rezervirano":
+				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Dog", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
 	}
 	defer func() {
@@ -1345,15 +1171,15 @@ func (ec *executionContext) fieldContext_Query_dog(ctx context.Context, field gr
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_dog_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_reserveKolo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_dogs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_dogs(ctx, field)
+func (ec *executionContext) _Query_unreserveKolo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_unreserveKolo(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1366,7 +1192,7 @@ func (ec *executionContext) _Query_dogs(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Dogs(rctx)
+		return ec.resolvers.Query().UnreserveKolo(rctx, fc.Args["_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1378,12 +1204,12 @@ func (ec *executionContext) _Query_dogs(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Dog)
+	res := resTmp.(*model.Kolo)
 	fc.Result = res
-	return ec.marshalNDog2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐDogᚄ(ctx, field.Selections, res)
+	return ec.marshalNKolo2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKolo(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_dogs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_unreserveKolo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1392,14 +1218,27 @@ func (ec *executionContext) fieldContext_Query_dogs(ctx context.Context, field g
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "_id":
-				return ec.fieldContext_Dog__id(ctx, field)
-			case "name":
-				return ec.fieldContext_Dog_name(ctx, field)
-			case "isGoodBoi":
-				return ec.fieldContext_Dog_isGoodBoi(ctx, field)
+				return ec.fieldContext_Kolo__id(ctx, field)
+			case "serijska_stevilka":
+				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
+			case "mnenje":
+				return ec.fieldContext_Kolo_mnenje(ctx, field)
+			case "rezervirano":
+				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Dog", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_unreserveKolo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1449,6 +1288,8 @@ func (ec *executionContext) fieldContext_Query_kolo(ctx context.Context, field g
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
+			case "rezervirano":
+				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -1512,6 +1353,8 @@ func (ec *executionContext) fieldContext_Query_kolesa(ctx context.Context, field
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
+			case "rezervirano":
+				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -3548,44 +3391,6 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputNewDog(ctx context.Context, obj interface{}) (model.NewDog, error) {
-	var it model.NewDog
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name", "isGoodBoi"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "isGoodBoi":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isGoodBoi"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.IsGoodBoi = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewKolo(ctx context.Context, obj interface{}) (model.NewKolo, error) {
 	var it model.NewKolo
 	asMap := map[string]interface{}{}
@@ -3679,55 +3484,6 @@ func (ec *executionContext) unmarshalInputNewPostajalisce(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
-var dogImplementors = []string{"Dog"}
-
-func (ec *executionContext) _Dog(ctx context.Context, sel ast.SelectionSet, obj *model.Dog) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, dogImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Dog")
-		case "_id":
-			out.Values[i] = ec._Dog__id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "name":
-			out.Values[i] = ec._Dog_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "isGoodBoi":
-			out.Values[i] = ec._Dog_isGoodBoi(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var koloImplementors = []string{"Kolo"}
 
 func (ec *executionContext) _Kolo(ctx context.Context, sel ast.SelectionSet, obj *model.Kolo) graphql.Marshaler {
@@ -3751,6 +3507,11 @@ func (ec *executionContext) _Kolo(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "mnenje":
 			out.Values[i] = ec._Kolo_mnenje(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "rezervirano":
+			out.Values[i] = ec._Kolo_rezervirano(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3796,13 +3557,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createDog":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createDog(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createKolo":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createKolo(ctx, field)
@@ -3923,7 +3677,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "dog":
+		case "reserveKolo":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3932,7 +3686,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_dog(ctx, field)
+				res = ec._Query_reserveKolo(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3945,7 +3699,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "dogs":
+		case "unreserveKolo":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3954,7 +3708,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_dogs(ctx, field)
+				res = ec._Query_unreserveKolo(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4427,64 +4181,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNDog2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐDog(ctx context.Context, sel ast.SelectionSet, v model.Dog) graphql.Marshaler {
-	return ec._Dog(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDog2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐDogᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Dog) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNDog2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐDog(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNDog2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐDog(ctx context.Context, sel ast.SelectionSet, v *model.Dog) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Dog(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4609,11 +4305,6 @@ func (ec *executionContext) marshalNKolo2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraph
 		return graphql.Null
 	}
 	return ec._Kolo(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNNewDog2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐNewDog(ctx context.Context, v interface{}) (model.NewDog, error) {
-	res, err := ec.unmarshalInputNewDog(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewKolo2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐNewKolo(ctx context.Context, v interface{}) (model.NewKolo, error) {

@@ -6,15 +6,9 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"go-graphql-mongodb-api/database"
 	"go-graphql-mongodb-api/graph/model"
 )
-
-// CreateDog is the resolver for the createDog field.
-func (r *mutationResolver) CreateDog(ctx context.Context, input model.NewDog) (*model.Dog, error) {
-	panic(fmt.Errorf("not implemented: CreatePostajalisce - createPostajalisce"))
-}
 
 // CreateKolo is the resolver for the createKolo field.
 func (r *mutationResolver) CreateKolo(ctx context.Context, input model.NewKolo) (*model.Kolo, error) {
@@ -26,14 +20,14 @@ func (r *mutationResolver) CreatePostajalisce(ctx context.Context, input model.N
 	return db.InsertPostajalisce(input), nil
 }
 
-// Dog is the resolver for the dog field.
-func (r *queryResolver) Dog(ctx context.Context, id *string) (*model.Dog, error) {
-	panic(fmt.Errorf("not implemented: CreatePostajalisce - createPostajalisce"))
+// ReserveKolo is the resolver for the reserveKolo field.
+func (r *queryResolver) ReserveKolo(ctx context.Context, id string) (*model.Kolo, error) {
+	return db.ReserveKolo(id, true), nil
 }
 
-// Dogs is the resolver for the dogs field.
-func (r *queryResolver) Dogs(ctx context.Context) ([]*model.Dog, error) {
-	return db.FindAllDog(), nil
+// UnreserveKolo is the resolver for the unreserveKolo field.
+func (r *queryResolver) UnreserveKolo(ctx context.Context, id string) (*model.Kolo, error) {
+	return db.ReserveKolo(id, false), nil
 }
 
 // Kolo is the resolver for the kolo field.
@@ -71,4 +65,5 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+
 var db = database.Connect("mongodb+srv://admin:admin@cluster0.nikbntq.mongodb.net/?retryWrites=true&w=majority")
