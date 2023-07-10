@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"go-graphql-mongodb-api/database"
 	"go-graphql-mongodb-api/graph/model"
 )
@@ -15,9 +16,29 @@ func (r *mutationResolver) CreateKolo(ctx context.Context, input model.NewKolo) 
 	return db.InsertKolo(input), nil
 }
 
+// UpdateKolo is the resolver for the updateKolo field.
+func (r *mutationResolver) UpdateKolo(ctx context.Context, input model.UpdateKolo) (*model.Kolo, error) {
+	return db.UpdateKolo(input), nil
+}
+
+// DeleteKolo is the resolver for the deleteKolo field.
+func (r *mutationResolver) DeleteKolo(ctx context.Context, input string) (string, error) {
+	return db.DeleteKolo(input), nil
+}
+
 // CreatePostajalisce is the resolver for the createPostajalisce field.
 func (r *mutationResolver) CreatePostajalisce(ctx context.Context, input model.NewPostajalisce) (*model.Postajalisce, error) {
 	return db.InsertPostajalisce(input), nil
+}
+
+// UpdatePostajalisce is the resolver for the updatePostajalisce field.
+func (r *mutationResolver) UpdatePostajalisce(ctx context.Context, input model.UpdatePostajalisce) (*model.Postajalisce, error) {
+	panic(fmt.Errorf("not implemented: UpdatePostajalisce - updatePostajalisce"))
+}
+
+// DeletePostajalisce is the resolver for the deletePostajalisce field.
+func (r *mutationResolver) DeletePostajalisce(ctx context.Context, input string) (string, error) {
+	panic(fmt.Errorf("not implemented: DeletePostajalisce - deletePostajalisce"))
 }
 
 // ReserveKolo is the resolver for the reserveKolo field.
@@ -65,5 +86,4 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
-
 var db = database.Connect("mongodb+srv://admin:admin@cluster0.nikbntq.mongodb.net/?retryWrites=true&w=majority")

@@ -28,3 +28,16 @@ type Postajalisce struct {
 	Longitude   float64 `json:"longitude" bson:"longitude"`
 	KolesaArray []*Kolo `json:"kolesaArray" bson:"kolesaArray"`
 }
+
+type UpdateKolo struct {
+	ID               string `json:"_id" bson:"_id"`
+	SerijskaStevilka string `json:"serijska_stevilka" bson:"serijska_stevilka"`
+}
+
+type UpdatePostajalisce struct {
+	ID        string   `json:"_id" bson:"_id"`
+	Ime       *string  `json:"ime,omitempty" bson:"ime,omitempty"`
+	Naslov    *string  `json:"naslov,omitempty" bson:"naslov,omitempty"`
+	Latitude  *float64 `json:"latitude,omitempty" bson:"latitude,omitempty"`
+	Longitude *float64 `json:"longitude,omitempty" bson:"longitude,omitempty"`
+}

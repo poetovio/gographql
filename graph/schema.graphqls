@@ -2,14 +2,14 @@
 #
 # https://gqlgen.com/getting-started/
 
-  type Postajalisce {
-    _id: ID!
-    ime: String!
-    naslov: String!
-    latitude: Float!
-    longitude: Float!
-    kolesaArray: [Kolo]!
-  }
+type Postajalisce {
+  _id: ID!
+  ime: String!
+  naslov: String!
+  latitude: Float!
+  longitude: Float!
+  kolesaArray: [Kolo]!
+}
 
 type Kolo {
   _id: ID!
@@ -31,6 +31,11 @@ input NewKolo {
   serijska_stevilka: String!
 }
 
+input UpdateKolo {
+  _id: ID!
+  serijska_stevilka: String!
+}
+
 input NewPostajalisce {
   ime: String!
   naslov: String!
@@ -38,7 +43,19 @@ input NewPostajalisce {
   longitude: Float!
 }
 
+input UpdatePostajalisce {
+  _id: ID!
+  ime: String
+  naslov: String
+  latitude: Float
+  longitude: Float
+}
+
 type Mutation {
   createKolo(input: NewKolo!): Kolo!
+  updateKolo(input: UpdateKolo!): Kolo!
+  deleteKolo(input: String!): String!
   createPostajalisce(input: NewPostajalisce!): Postajalisce!
+  updatePostajalisce(input: UpdatePostajalisce!): Postajalisce!
+  deletePostajalisce(input: String!): String!
 }

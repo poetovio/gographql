@@ -21,7 +21,6 @@ const (
 	DATABASE     = "projekt"
 	KOLESA       = "kolesa"
 	POSTAJALISCA = "postajalisca"
-	DOGS         = "dogs"
 )
 
 func Connect(url string) *DB {
@@ -85,6 +84,52 @@ func (db *DB) InsertKolo(kolo model.NewKolo) *model.Kolo {
 	returnKolo := model.Kolo{ID: insertedID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: make([]*string, 500)}
 
 	return &returnKolo
+}
+
+// function for updating a Kolo in database
+func (db *DB) UpdateKolo(kolo model.UpdateKolo) *model.Kolo {
+	koloColl := db.client.Database(DATABASE).Collection(KOLESA)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	ObjectID, err := primitive.ObjectIDFromHex(kolo.ID)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal()
+	}
+
+	filer := bson.M{"_id": ObjectID}
+
+	update := bson.M{"$set": bson.M{"serijska_stevilka": kolo.SerijskaStevilka}}
+
+	_, err = koloColl.UpdateOne(ctx, filer, update)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't update Kolo in database")
+		log.Fatal(err)
+	}
+
+	return db.FindKolo(kolo.ID)
+}
+
+// function for deleting a Kolo from database
+func (db *DB) DeleteKolo(id string) string {
+	koloColl := db.client.Database(DATABASE).Collection(KOLESA)
+
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"_id": ObjectID}
+
+	_, err = koloColl.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't delete Kolo from database")
+		log.Fatal(err)
+	}
+
+	return "OK -> Successfully deleted Kolo from database."
 }
 
 // function for finding a kolo in database
@@ -187,6 +232,8 @@ func (db *DB) InsertPostajalisce(postajalisce model.NewPostajalisce) *model.Post
 
 	return &returnPostajalisce
 }
+
+// function for updating a Postajalisce in database
 
 // function for finding a Postajalisce in database by id
 func (db *DB) FindPostajalisce(id string) *model.Postajalisce {
