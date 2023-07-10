@@ -9,6 +9,7 @@ import (
 	"go-graphql-mongodb-api/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/rs/cors"
 )
 
@@ -31,6 +32,7 @@ func main() {
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
 	http.Handle("/", c.Handler(srv))
+	http.Handle("/playground", playground.Handler("GraphQL playground", "/graphql"))
 
 	log.Printf("OK -> server is running on port %s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
