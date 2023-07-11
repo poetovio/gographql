@@ -117,6 +117,10 @@ func (db *DB) DeleteKolo(id string) string {
 	koloColl := db.client.Database(DATABASE).Collection(KOLESA)
 
 	ObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -234,6 +238,71 @@ func (db *DB) InsertPostajalisce(postajalisce model.NewPostajalisce) *model.Post
 }
 
 // function for updating a Postajalisce in database
+func (db *DB) UpdatePostajalisce(postajalisce model.UpdatePostajalisce) *model.Postajalisce {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	ObjectID, err := primitive.ObjectIDFromHex(postajalisce.ID)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
+
+	filter := bson.M{"_id": ObjectID}
+
+	update := bson.M{}
+
+	if postajalisce.Ime != nil {
+		update["ime"] = postajalisce.Ime
+	}
+
+	if postajalisce.Naslov != nil {
+		update["naslov"] = postajalisce.Naslov
+	}
+
+	if postajalisce.Latitude != nil {
+		update["latitude"] = postajalisce.Latitude
+	}
+
+	if postajalisce.Longitude != nil {
+		update["longitude"] = postajalisce.Longitude
+	}
+
+	updatePost := bson.M{"$set": update}
+
+	_, err = postajalisceColl.UpdateOne(ctx, filter, updatePost)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't update Postajalisce")
+		log.Fatal(err)
+	}
+
+	return db.FindPostajalisce(postajalisce.ID)
+}
+
+// function for deleting a Postajalisce from database
+func (db *DB) DeletePostajalisce(id string) string {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"_id": ObjectID}
+
+	_, err = postajalisceColl.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't delete Postajalisce from database")
+		log.Fatal(err)
+	}
+
+	return "OK -> Successfully deleted Postajalisce from database"
+}
 
 // function for finding a Postajalisce in database by id
 func (db *DB) FindPostajalisce(id string) *model.Postajalisce {
