@@ -497,6 +497,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputIzposojaKolesa,
+		ec.unmarshalInputKoloInput,
 		ec.unmarshalInputNewKolo,
 		ec.unmarshalInputNewPostajalisce,
 		ec.unmarshalInputUpdateKolo,
@@ -4997,6 +4998,62 @@ func (ec *executionContext) unmarshalInputIzposojaKolesa(ctx context.Context, ob
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputKoloInput(ctx context.Context, obj interface{}) (model.KoloInput, error) {
+	var it model.KoloInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"_id", "serijska_stevilka", "mnenje", "rezervirano"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "serijska_stevilka":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serijska_stevilka"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SerijskaStevilka = data
+		case "mnenje":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mnenje"))
+			data, err := ec.unmarshalNString2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Mnenje = data
+		case "rezervirano":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rezervirano"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rezervirano = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewKolo(ctx context.Context, obj interface{}) (model.NewKolo, error) {
 	var it model.NewKolo
 	asMap := map[string]interface{}{}
@@ -5127,7 +5184,7 @@ func (ec *executionContext) unmarshalInputUpdatePostajalisce(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"_id", "ime", "naslov", "latitude", "longitude"}
+	fieldsInOrder := [...]string{"_id", "ime", "naslov", "latitude", "longitude", "kolesaArray"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5179,6 +5236,15 @@ func (ec *executionContext) unmarshalInputUpdatePostajalisce(ctx context.Context
 				return it, err
 			}
 			it.Longitude = data
+		case "kolesaArray":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kolesaArray"))
+			data, err := ec.unmarshalOKoloInput2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKoloInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.KolesaArray = data
 		}
 	}
 
@@ -6788,6 +6854,34 @@ func (ec *executionContext) marshalOKolo2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraph
 		return graphql.Null
 	}
 	return ec._Kolo(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOKoloInput2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKoloInput(ctx context.Context, v interface{}) ([]*model.KoloInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.KoloInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOKoloInput2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKoloInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOKoloInput2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKoloInput(ctx context.Context, v interface{}) (*model.KoloInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputKoloInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

@@ -270,6 +270,10 @@ func (db *DB) UpdatePostajalisce(postajalisce model.UpdatePostajalisce) *model.P
 		update["longitude"] = postajalisce.Longitude
 	}
 
+	if postajalisce.KolesaArray != nil {
+		update["kolesaArray"] = postajalisce.KolesaArray
+	}
+
 	updatePost := bson.M{"$set": update}
 
 	_, err = postajalisceColl.UpdateOne(ctx, filter, updatePost)
@@ -368,14 +372,24 @@ func (db *DB) BorrowKolo(input model.IzposojaKolesa) *model.Izposoja {
 
 	postajalisce := db.FindPostajalisce(input.StartStationID)
 
-	updatedKolesaArray := make([]*model.Kolo, 0)
+	updatedKolesaArray := make([]*model.KoloInput, 0)
 	for _, kolo := range postajalisce.KolesaArray {
 		if kolo.ID != input.BikeID {
-			updatedKolesaArray = append(updatedKolesaArray, kolo)
+			updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano}
+			updatedKolesaArray = append(updatedKolesaArray, &updatedKolo)
 		}
 	}
 
-	postajalisce.KolesaArray = updatedKolesaArray
+	updatedPostajalisce := model.UpdatePostajalisce{
+		ID:          postajalisce.ID,
+		Ime:         &postajalisce.Ime,
+		Naslov:      &postajalisce.Naslov,
+		Latitude:    &postajalisce.Latitude,
+		Longitude:   &postajalisce.Longitude,
+		KolesaArray: updatedKolesaArray,
+	}
+
+	db.UpdatePostajalisce(updatedPostajalisce)
 
 	inserg, err := izposojeColl.InsertOne(ctx, bson.D{{Key: "start_date", Value: input.StartDate}, {Key: "start_station_id", Value: input.StartStationID},
 		{Key: "bike_id", Value: input.BikeID}, {Key: "trenutna_zasedenost_start", Value: len(postajalisce.KolesaArray)}, {Key: "weather", Value: input.Weather}, {Key: "start_station", Value: input.StartStation},
@@ -409,7 +423,26 @@ func (db *DB) ReturnKolo(input model.VraciloKolesa) *model.Izposoja {
 
 	kolo := db.FindKolo(input.BikeID)
 
-	postajalisce.KolesaArray = append(postajalisce.KolesaArray, kolo)
+	novoKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano}
+
+	updatedKolesaArray := make([]*model.KoloInput, 0)
+	for _, kolo := range postajalisce.KolesaArray {
+		updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano}
+		updatedKolesaArray = append(updatedKolesaArray, &updatedKolo)
+	}
+
+	updatedKolesaArray = append(updatedKolesaArray, &novoKolo)
+
+	updatedPostajalisce := model.UpdatePostajalisce{
+		ID:          postajalisce.ID,
+		Ime:         &postajalisce.Ime,
+		Naslov:      &postajalisce.Naslov,
+		Latitude:    &postajalisce.Latitude,
+		Longitude:   &postajalisce.Longitude,
+		KolesaArray: updatedKolesaArray,
+	}
+
+	db.UpdatePostajalisce(updatedPostajalisce)
 
 	filter := bson.M{"_id": ObjectID}
 
