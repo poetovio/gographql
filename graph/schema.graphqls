@@ -71,19 +71,19 @@ input UpdatePostajalisce {
 
 input IzposojaKolesa {
   start_date: String!
-  start_stationi_id: String!
+  start_station_id: String!
   bike_id: String!
-  trenutna_zasedenost_start: Int!
   weather: String!
   start_station: String!
   username: String!
 }
 
 input VraciloKolesa {
+  _id: ID!
+  bike_id: String!
   end_date: String!
   end_station_id: String!
   duration: Int!
-  trenutna_zasedenost_start: Int!
   end_station: String!
 }
 
@@ -95,6 +95,6 @@ type Mutation {
   updatePostajalisce(input: UpdatePostajalisce!): Postajalisce!
   deletePostajalisce(input: String!): String!
   izposojaKolesa(input: IzposojaKolesa!): Izposoja!
-  VraciloKolesa(input: VraciloKolesa!): Izposoja!
+  vraciloKolesa(input: VraciloKolesa!): Izposoja!
   deleteIzposoja(input: String!): String!
 }

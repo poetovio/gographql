@@ -19,13 +19,12 @@ type Izposoja struct {
 }
 
 type IzposojaKolesa struct {
-	StartDate               string `json:"start_date" bson:"start_date"`
-	StartStationiID         string `json:"start_stationi_id" bson:"start_stationi_id"`
-	BikeID                  string `json:"bike_id" bson:"bike_id"`
-	TrenutnaZasedenostStart int    `json:"trenutna_zasedenost_start" bson:"trenutna_zasedenost_start"`
-	Weather                 string `json:"weather" bson:"weather"`
-	StartStation            string `json:"start_station" bson:"start_station"`
-	Username                string `json:"username" bson:"username"`
+	StartDate      string `json:"start_date" bson:"start_date"`
+	StartStationID string `json:"start_station_id" bson:"start_station_id"`
+	BikeID         string `json:"bike_id" bson:"bike_id"`
+	Weather        string `json:"weather" bson:"weather"`
+	StartStation   string `json:"start_station" bson:"start_station"`
+	Username       string `json:"username" bson:"username"`
 }
 
 type Kolo struct {
@@ -69,9 +68,10 @@ type UpdatePostajalisce struct {
 }
 
 type VraciloKolesa struct {
-	EndDate                 string `json:"end_date" bson:"end_date"`
-	EndStationID            string `json:"end_station_id" bson:"end_station_id"`
-	Duration                int    `json:"duration" bson:"duration"`
-	TrenutnaZasedenostStart int    `json:"trenutna_zasedenost_start" bson:"trenutna_zasedenost_start"`
-	EndStation              string `json:"end_station" bson:"end_station"`
+	ID           string `json:"_id" bson:"_id"`
+	BikeID       string `json:"bike_id" bson:"bike_id"`
+	EndDate      string `json:"end_date" bson:"end_date"`
+	EndStationID string `json:"end_station_id" bson:"end_station_id"`
+	Duration     int    `json:"duration" bson:"duration"`
+	EndStation   string `json:"end_station" bson:"end_station"`
 }

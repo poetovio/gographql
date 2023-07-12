@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"go-graphql-mongodb-api/database"
 	"go-graphql-mongodb-api/graph/model"
 )
@@ -43,17 +42,17 @@ func (r *mutationResolver) DeletePostajalisce(ctx context.Context, input string)
 
 // IzposojaKolesa is the resolver for the izposojaKolesa field.
 func (r *mutationResolver) IzposojaKolesa(ctx context.Context, input model.IzposojaKolesa) (*model.Izposoja, error) {
-	panic(fmt.Errorf("not implemented: IzposojaKolesa - izposojaKolesa"))
+	return db.BorrowKolo(input), nil
 }
 
 // VraciloKolesa is the resolver for the VraciloKolesa field.
 func (r *mutationResolver) VraciloKolesa(ctx context.Context, input model.VraciloKolesa) (*model.Izposoja, error) {
-	panic(fmt.Errorf("not implemented: VraciloKolesa - VraciloKolesa"))
+	return db.ReturnKolo(input), nil
 }
 
 // DeleteIzposoja is the resolver for the deleteIzposoja field.
 func (r *mutationResolver) DeleteIzposoja(ctx context.Context, input string) (string, error) {
-	panic(fmt.Errorf("not implemented: DeleteIzposoja - deleteIzposoja"))
+	return db.DeleteIzposoja(input), nil
 }
 
 // ReserveKolo is the resolver for the reserveKolo field.

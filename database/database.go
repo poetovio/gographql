@@ -361,8 +361,93 @@ func (db *DB) FindAllPostajalisce() []*model.Postajalisce {
 }
 
 // function for borrowing a Kolo from Postajalisce
+func (db *DB) BorrowKolo(input model.IzposojaKolesa) *model.Izposoja {
+	izposojeColl := db.client.Database(DATABASE).Collection(IZPOSOJE)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	postajalisce := db.FindPostajalisce(input.StartStationID)
+
+	updatedKolesaArray := make([]*model.Kolo, 0)
+	for _, kolo := range postajalisce.KolesaArray {
+		if kolo.ID != input.BikeID {
+			updatedKolesaArray = append(updatedKolesaArray, kolo)
+		}
+	}
+
+	postajalisce.KolesaArray = updatedKolesaArray
+
+	inserg, err := izposojeColl.InsertOne(ctx, bson.D{{Key: "start_date", Value: input.StartDate}, {Key: "start_station_id", Value: input.StartStationID},
+		{Key: "bike_id", Value: input.BikeID}, {Key: "trenutna_zasedenost_start", Value: len(postajalisce.KolesaArray)}, {Key: "weather", Value: input.Weather}, {Key: "start_station", Value: input.StartStation},
+		{Key: "username", Value: input.Username}})
+
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't insert Izposoja into database")
+		log.Fatal(err)
+	}
+
+	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
+	returnIzposoja := model.Izposoja{ID: insertedID, StartDate: input.StartDate, StartStationID: input.StartStationID, BikeID: input.BikeID, Weather: input.Weather, Username: input.Username,
+		TrenutnaZasedenostStart: len(postajalisce.KolesaArray), StartStation: input.StartStation}
+
+	return &returnIzposoja
+}
 
 // function for returning a Kolo to Postajalisce
+func (db *DB) ReturnKolo(input model.VraciloKolesa) *model.Izposoja {
+	izposojeColl := db.client.Database(DATABASE).Collection(IZPOSOJE)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	ObjectID, err := primitive.ObjectIDFromHex(input.ID)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
+
+	postajalisce := db.FindPostajalisce(input.EndStationID)
+
+	kolo := db.FindKolo(input.BikeID)
+
+	postajalisce.KolesaArray = append(postajalisce.KolesaArray, kolo)
+
+	filter := bson.M{"_id": ObjectID}
+
+	update := bson.M{"$set": bson.M{"end_date": input.EndDate, "end_station_id": input.EndStationID, "trenutna_zasedenost_end": len(postajalisce.KolesaArray),
+		"end_station": input.EndStation, "duration": input.Duration}}
+
+	_, err = izposojeColl.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't return Kolo into Postajalisce")
+		log.Fatal(err)
+	}
+
+	return db.FindIzposoja(input.ID)
+}
+
+// function for deleting an Izposoja from database
+func (db *DB) DeleteIzposoja(id string) string {
+	izposojeColl := db.client.Database(DATABASE).Collection(IZPOSOJE)
+
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"_id": ObjectID}
+
+	_, err = izposojeColl.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't delete Izposoja from database")
+		log.Fatal(err)
+	}
+
+	return "OK -> successfully deleted Izposoja from database"
+}
 
 // function for finding an Izposoja in database
 func (db *DB) FindIzposoja(id string) *model.Izposoja {

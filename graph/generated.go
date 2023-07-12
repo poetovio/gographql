@@ -353,12 +353,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdatePostajalisce(childComplexity, args["input"].(model.UpdatePostajalisce)), true
 
-	case "Mutation.VraciloKolesa":
+	case "Mutation.vraciloKolesa":
 		if e.complexity.Mutation.VraciloKolesa == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_VraciloKolesa_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_vraciloKolesa_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -618,21 +618,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_VraciloKolesa_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.VraciloKolesa
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNVraciloKolesa2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐVraciloKolesa(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createKolo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -745,6 +730,21 @@ func (ec *executionContext) field_Mutation_updatePostajalisce_args(ctx context.C
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdatePostajalisce2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐUpdatePostajalisce(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_vraciloKolesa_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.VraciloKolesa
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNVraciloKolesa2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐVraciloKolesa(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2078,8 +2078,8 @@ func (ec *executionContext) fieldContext_Mutation_izposojaKolesa(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_VraciloKolesa(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_VraciloKolesa(ctx, field)
+func (ec *executionContext) _Mutation_vraciloKolesa(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_vraciloKolesa(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2109,7 +2109,7 @@ func (ec *executionContext) _Mutation_VraciloKolesa(ctx context.Context, field g
 	return ec.marshalNIzposoja2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposoja(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_VraciloKolesa(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_vraciloKolesa(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2154,7 +2154,7 @@ func (ec *executionContext) fieldContext_Mutation_VraciloKolesa(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_VraciloKolesa_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_vraciloKolesa_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4930,7 +4930,7 @@ func (ec *executionContext) unmarshalInputIzposojaKolesa(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"start_date", "start_stationi_id", "bike_id", "trenutna_zasedenost_start", "weather", "start_station", "username"}
+	fieldsInOrder := [...]string{"start_date", "start_station_id", "bike_id", "weather", "start_station", "username"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4946,15 +4946,15 @@ func (ec *executionContext) unmarshalInputIzposojaKolesa(ctx context.Context, ob
 				return it, err
 			}
 			it.StartDate = data
-		case "start_stationi_id":
+		case "start_station_id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_stationi_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_station_id"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.StartStationiID = data
+			it.StartStationID = data
 		case "bike_id":
 			var err error
 
@@ -4964,15 +4964,6 @@ func (ec *executionContext) unmarshalInputIzposojaKolesa(ctx context.Context, ob
 				return it, err
 			}
 			it.BikeID = data
-		case "trenutna_zasedenost_start":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("trenutna_zasedenost_start"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TrenutnaZasedenostStart = data
 		case "weather":
 			var err error
 
@@ -5201,13 +5192,31 @@ func (ec *executionContext) unmarshalInputVraciloKolesa(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"end_date", "end_station_id", "duration", "trenutna_zasedenost_start", "end_station"}
+	fieldsInOrder := [...]string{"_id", "bike_id", "end_date", "end_station_id", "duration", "end_station"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "bike_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bike_id"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BikeID = data
 		case "end_date":
 			var err error
 
@@ -5235,15 +5244,6 @@ func (ec *executionContext) unmarshalInputVraciloKolesa(ctx context.Context, obj
 				return it, err
 			}
 			it.Duration = data
-		case "trenutna_zasedenost_start":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("trenutna_zasedenost_start"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TrenutnaZasedenostStart = data
 		case "end_station":
 			var err error
 
@@ -5476,9 +5476,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "VraciloKolesa":
+		case "vraciloKolesa":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_VraciloKolesa(ctx, field)
+				return ec._Mutation_vraciloKolesa(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
