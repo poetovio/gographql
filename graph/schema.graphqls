@@ -18,6 +18,22 @@ type Kolo {
   rezervirano: Boolean!
 }
 
+type Izposoja {
+  _id: ID!
+  start_date: String!
+  end_date: String
+  start_station_id: String!
+  end_station_id: String
+  bike_id: String!
+  duration: Int
+  trenutna_zasedenost_start: Int!
+  trenutna_zasedenost_end: Int
+  weather: String!
+  start_station: String!
+  end_station: String!
+  username: String!
+}
+
 type Query {
   reserveKolo(_id: String!): Kolo!
   unreserveKolo(_id: String!): Kolo!
@@ -25,6 +41,8 @@ type Query {
   kolesa: [Kolo!]!
   postajalisce(_id: String!): Postajalisce!
   postajalisca: [Postajalisce!]!
+  izposoja(_id: String!): Izposoja!
+  izposoje: [Izposoja!]!
 }
 
 input NewKolo {
@@ -51,6 +69,24 @@ input UpdatePostajalisce {
   longitude: Float
 }
 
+input IzposojaKolesa {
+  start_date: String!
+  start_stationi_id: String!
+  bike_id: String!
+  trenutna_zasedenost_start: Int!
+  weather: String!
+  start_station: String!
+  username: String!
+}
+
+input VraciloKolesa {
+  end_date: String!
+  end_station_id: String!
+  duration: Int!
+  trenutna_zasedenost_start: Int!
+  end_station: String!
+}
+
 type Mutation {
   createKolo(input: NewKolo!): Kolo!
   updateKolo(input: UpdateKolo!): Kolo!
@@ -58,4 +94,7 @@ type Mutation {
   createPostajalisce(input: NewPostajalisce!): Postajalisce!
   updatePostajalisce(input: UpdatePostajalisce!): Postajalisce!
   deletePostajalisce(input: String!): String!
+  izposojaKolesa(input: IzposojaKolesa!): Izposoja!
+  VraciloKolesa(input: VraciloKolesa!): Izposoja!
+  deleteIzposoja(input: String!): String!
 }

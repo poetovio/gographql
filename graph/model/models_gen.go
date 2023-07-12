@@ -2,6 +2,32 @@
 
 package model
 
+type Izposoja struct {
+	ID                      string  `json:"_id" bson:"_id"`
+	StartDate               string  `json:"start_date" bson:"start_date"`
+	EndDate                 *string `json:"end_date,omitempty" bson:"end_date,omitempty"`
+	StartStationID          string  `json:"start_station_id" bson:"start_station_id"`
+	EndStationID            *string `json:"end_station_id,omitempty" bson:"end_station_id,omitempty"`
+	BikeID                  string  `json:"bike_id" bson:"bike_id"`
+	Duration                *int    `json:"duration,omitempty" bson:"duration,omitempty"`
+	TrenutnaZasedenostStart int     `json:"trenutna_zasedenost_start" bson:"trenutna_zasedenost_start"`
+	TrenutnaZasedenostEnd   *int    `json:"trenutna_zasedenost_end,omitempty" bson:"trenutna_zasedenost_end,omitempty"`
+	Weather                 string  `json:"weather" bson:"weather"`
+	StartStation            string  `json:"start_station" bson:"start_station"`
+	EndStation              string  `json:"end_station" bson:"end_station"`
+	Username                string  `json:"username" bson:"username"`
+}
+
+type IzposojaKolesa struct {
+	StartDate               string `json:"start_date" bson:"start_date"`
+	StartStationiID         string `json:"start_stationi_id" bson:"start_stationi_id"`
+	BikeID                  string `json:"bike_id" bson:"bike_id"`
+	TrenutnaZasedenostStart int    `json:"trenutna_zasedenost_start" bson:"trenutna_zasedenost_start"`
+	Weather                 string `json:"weather" bson:"weather"`
+	StartStation            string `json:"start_station" bson:"start_station"`
+	Username                string `json:"username" bson:"username"`
+}
+
 type Kolo struct {
 	ID               string    `json:"_id" bson:"_id"`
 	SerijskaStevilka string    `json:"serijska_stevilka" bson:"serijska_stevilka"`
@@ -40,4 +66,12 @@ type UpdatePostajalisce struct {
 	Naslov    *string  `json:"naslov,omitempty" bson:"naslov,omitempty"`
 	Latitude  *float64 `json:"latitude,omitempty" bson:"latitude,omitempty"`
 	Longitude *float64 `json:"longitude,omitempty" bson:"longitude,omitempty"`
+}
+
+type VraciloKolesa struct {
+	EndDate                 string `json:"end_date" bson:"end_date"`
+	EndStationID            string `json:"end_station_id" bson:"end_station_id"`
+	Duration                int    `json:"duration" bson:"duration"`
+	TrenutnaZasedenostStart int    `json:"trenutna_zasedenost_start" bson:"trenutna_zasedenost_start"`
+	EndStation              string `json:"end_station" bson:"end_station"`
 }

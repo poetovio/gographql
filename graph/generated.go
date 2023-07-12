@@ -45,6 +45,22 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Izposoja struct {
+		BikeID                  func(childComplexity int) int
+		Duration                func(childComplexity int) int
+		EndDate                 func(childComplexity int) int
+		EndStation              func(childComplexity int) int
+		EndStationID            func(childComplexity int) int
+		ID                      func(childComplexity int) int
+		StartDate               func(childComplexity int) int
+		StartStation            func(childComplexity int) int
+		StartStationID          func(childComplexity int) int
+		TrenutnaZasedenostEnd   func(childComplexity int) int
+		TrenutnaZasedenostStart func(childComplexity int) int
+		Username                func(childComplexity int) int
+		Weather                 func(childComplexity int) int
+	}
+
 	Kolo struct {
 		ID               func(childComplexity int) int
 		Mnenje           func(childComplexity int) int
@@ -55,10 +71,13 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateKolo         func(childComplexity int, input model.NewKolo) int
 		CreatePostajalisce func(childComplexity int, input model.NewPostajalisce) int
+		DeleteIzposoja     func(childComplexity int, input string) int
 		DeleteKolo         func(childComplexity int, input string) int
 		DeletePostajalisce func(childComplexity int, input string) int
+		IzposojaKolesa     func(childComplexity int, input model.IzposojaKolesa) int
 		UpdateKolo         func(childComplexity int, input model.UpdateKolo) int
 		UpdatePostajalisce func(childComplexity int, input model.UpdatePostajalisce) int
+		VraciloKolesa      func(childComplexity int, input model.VraciloKolesa) int
 	}
 
 	Postajalisce struct {
@@ -71,6 +90,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Izposoja      func(childComplexity int, id string) int
+		Izposoje      func(childComplexity int) int
 		Kolesa        func(childComplexity int) int
 		Kolo          func(childComplexity int, id string) int
 		Postajalisca  func(childComplexity int) int
@@ -87,6 +108,9 @@ type MutationResolver interface {
 	CreatePostajalisce(ctx context.Context, input model.NewPostajalisce) (*model.Postajalisce, error)
 	UpdatePostajalisce(ctx context.Context, input model.UpdatePostajalisce) (*model.Postajalisce, error)
 	DeletePostajalisce(ctx context.Context, input string) (string, error)
+	IzposojaKolesa(ctx context.Context, input model.IzposojaKolesa) (*model.Izposoja, error)
+	VraciloKolesa(ctx context.Context, input model.VraciloKolesa) (*model.Izposoja, error)
+	DeleteIzposoja(ctx context.Context, input string) (string, error)
 }
 type QueryResolver interface {
 	ReserveKolo(ctx context.Context, id string) (*model.Kolo, error)
@@ -95,6 +119,8 @@ type QueryResolver interface {
 	Kolesa(ctx context.Context) ([]*model.Kolo, error)
 	Postajalisce(ctx context.Context, id string) (*model.Postajalisce, error)
 	Postajalisca(ctx context.Context) ([]*model.Postajalisce, error)
+	Izposoja(ctx context.Context, id string) (*model.Izposoja, error)
+	Izposoje(ctx context.Context) ([]*model.Izposoja, error)
 }
 
 type executableSchema struct {
@@ -111,6 +137,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Izposoja.bike_id":
+		if e.complexity.Izposoja.BikeID == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.BikeID(childComplexity), true
+
+	case "Izposoja.duration":
+		if e.complexity.Izposoja.Duration == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.Duration(childComplexity), true
+
+	case "Izposoja.end_date":
+		if e.complexity.Izposoja.EndDate == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.EndDate(childComplexity), true
+
+	case "Izposoja.end_station":
+		if e.complexity.Izposoja.EndStation == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.EndStation(childComplexity), true
+
+	case "Izposoja.end_station_id":
+		if e.complexity.Izposoja.EndStationID == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.EndStationID(childComplexity), true
+
+	case "Izposoja._id":
+		if e.complexity.Izposoja.ID == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.ID(childComplexity), true
+
+	case "Izposoja.start_date":
+		if e.complexity.Izposoja.StartDate == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.StartDate(childComplexity), true
+
+	case "Izposoja.start_station":
+		if e.complexity.Izposoja.StartStation == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.StartStation(childComplexity), true
+
+	case "Izposoja.start_station_id":
+		if e.complexity.Izposoja.StartStationID == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.StartStationID(childComplexity), true
+
+	case "Izposoja.trenutna_zasedenost_end":
+		if e.complexity.Izposoja.TrenutnaZasedenostEnd == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.TrenutnaZasedenostEnd(childComplexity), true
+
+	case "Izposoja.trenutna_zasedenost_start":
+		if e.complexity.Izposoja.TrenutnaZasedenostStart == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.TrenutnaZasedenostStart(childComplexity), true
+
+	case "Izposoja.username":
+		if e.complexity.Izposoja.Username == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.Username(childComplexity), true
+
+	case "Izposoja.weather":
+		if e.complexity.Izposoja.Weather == nil {
+			break
+		}
+
+		return e.complexity.Izposoja.Weather(childComplexity), true
 
 	case "Kolo._id":
 		if e.complexity.Kolo.ID == nil {
@@ -164,6 +281,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePostajalisce(childComplexity, args["input"].(model.NewPostajalisce)), true
 
+	case "Mutation.deleteIzposoja":
+		if e.complexity.Mutation.DeleteIzposoja == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteIzposoja_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteIzposoja(childComplexity, args["input"].(string)), true
+
 	case "Mutation.deleteKolo":
 		if e.complexity.Mutation.DeleteKolo == nil {
 			break
@@ -188,6 +317,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeletePostajalisce(childComplexity, args["input"].(string)), true
 
+	case "Mutation.izposojaKolesa":
+		if e.complexity.Mutation.IzposojaKolesa == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_izposojaKolesa_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.IzposojaKolesa(childComplexity, args["input"].(model.IzposojaKolesa)), true
+
 	case "Mutation.updateKolo":
 		if e.complexity.Mutation.UpdateKolo == nil {
 			break
@@ -211,6 +352,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdatePostajalisce(childComplexity, args["input"].(model.UpdatePostajalisce)), true
+
+	case "Mutation.VraciloKolesa":
+		if e.complexity.Mutation.VraciloKolesa == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_VraciloKolesa_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.VraciloKolesa(childComplexity, args["input"].(model.VraciloKolesa)), true
 
 	case "Postajalisce._id":
 		if e.complexity.Postajalisce.ID == nil {
@@ -253,6 +406,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Postajalisce.Naslov(childComplexity), true
+
+	case "Query.izposoja":
+		if e.complexity.Query.Izposoja == nil {
+			break
+		}
+
+		args, err := ec.field_Query_izposoja_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Izposoja(childComplexity, args["_id"].(string)), true
+
+	case "Query.izposoje":
+		if e.complexity.Query.Izposoje == nil {
+			break
+		}
+
+		return e.complexity.Query.Izposoje(childComplexity), true
 
 	case "Query.kolesa":
 		if e.complexity.Query.Kolesa == nil {
@@ -324,10 +496,12 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputIzposojaKolesa,
 		ec.unmarshalInputNewKolo,
 		ec.unmarshalInputNewPostajalisce,
 		ec.unmarshalInputUpdateKolo,
 		ec.unmarshalInputUpdatePostajalisce,
+		ec.unmarshalInputVraciloKolesa,
 	)
 	first := true
 
@@ -444,6 +618,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_VraciloKolesa_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.VraciloKolesa
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNVraciloKolesa2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐVraciloKolesa(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createKolo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -474,6 +663,21 @@ func (ec *executionContext) field_Mutation_createPostajalisce_args(ctx context.C
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteIzposoja_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteKolo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -496,6 +700,21 @@ func (ec *executionContext) field_Mutation_deletePostajalisce_args(ctx context.C
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_izposojaKolesa_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.IzposojaKolesa
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNIzposojaKolesa2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposojaKolesa(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -546,6 +765,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_izposoja_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["_id"] = arg0
 	return args, nil
 }
 
@@ -646,6 +880,566 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Izposoja__id(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja__id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja__id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_start_date(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_start_date(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_start_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_end_date(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_end_date(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_end_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_start_station_id(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_start_station_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartStationID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_start_station_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_end_station_id(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_end_station_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndStationID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_end_station_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_bike_id(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_bike_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BikeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_bike_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_duration(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_duration(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Duration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_duration(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_trenutna_zasedenost_start(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_trenutna_zasedenost_start(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TrenutnaZasedenostStart, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_trenutna_zasedenost_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_trenutna_zasedenost_end(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_trenutna_zasedenost_end(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TrenutnaZasedenostEnd, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_trenutna_zasedenost_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_weather(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_weather(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weather, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_weather(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_start_station(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_start_station(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartStation, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_start_station(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_end_station(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_end_station(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndStation, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_end_station(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Izposoja_username(ctx context.Context, field graphql.CollectedField, obj *model.Izposoja) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Izposoja_username(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Username, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Izposoja_username(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Izposoja",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Kolo__id(ctx context.Context, field graphql.CollectedField, obj *model.Kolo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Kolo__id(ctx, field)
@@ -1195,6 +1989,227 @@ func (ec *executionContext) fieldContext_Mutation_deletePostajalisce(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePostajalisce_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_izposojaKolesa(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_izposojaKolesa(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().IzposojaKolesa(rctx, fc.Args["input"].(model.IzposojaKolesa))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Izposoja)
+	fc.Result = res
+	return ec.marshalNIzposoja2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposoja(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_izposojaKolesa(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_Izposoja__id(ctx, field)
+			case "start_date":
+				return ec.fieldContext_Izposoja_start_date(ctx, field)
+			case "end_date":
+				return ec.fieldContext_Izposoja_end_date(ctx, field)
+			case "start_station_id":
+				return ec.fieldContext_Izposoja_start_station_id(ctx, field)
+			case "end_station_id":
+				return ec.fieldContext_Izposoja_end_station_id(ctx, field)
+			case "bike_id":
+				return ec.fieldContext_Izposoja_bike_id(ctx, field)
+			case "duration":
+				return ec.fieldContext_Izposoja_duration(ctx, field)
+			case "trenutna_zasedenost_start":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_start(ctx, field)
+			case "trenutna_zasedenost_end":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_end(ctx, field)
+			case "weather":
+				return ec.fieldContext_Izposoja_weather(ctx, field)
+			case "start_station":
+				return ec.fieldContext_Izposoja_start_station(ctx, field)
+			case "end_station":
+				return ec.fieldContext_Izposoja_end_station(ctx, field)
+			case "username":
+				return ec.fieldContext_Izposoja_username(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Izposoja", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_izposojaKolesa_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_VraciloKolesa(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_VraciloKolesa(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().VraciloKolesa(rctx, fc.Args["input"].(model.VraciloKolesa))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Izposoja)
+	fc.Result = res
+	return ec.marshalNIzposoja2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposoja(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_VraciloKolesa(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_Izposoja__id(ctx, field)
+			case "start_date":
+				return ec.fieldContext_Izposoja_start_date(ctx, field)
+			case "end_date":
+				return ec.fieldContext_Izposoja_end_date(ctx, field)
+			case "start_station_id":
+				return ec.fieldContext_Izposoja_start_station_id(ctx, field)
+			case "end_station_id":
+				return ec.fieldContext_Izposoja_end_station_id(ctx, field)
+			case "bike_id":
+				return ec.fieldContext_Izposoja_bike_id(ctx, field)
+			case "duration":
+				return ec.fieldContext_Izposoja_duration(ctx, field)
+			case "trenutna_zasedenost_start":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_start(ctx, field)
+			case "trenutna_zasedenost_end":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_end(ctx, field)
+			case "weather":
+				return ec.fieldContext_Izposoja_weather(ctx, field)
+			case "start_station":
+				return ec.fieldContext_Izposoja_start_station(ctx, field)
+			case "end_station":
+				return ec.fieldContext_Izposoja_end_station(ctx, field)
+			case "username":
+				return ec.fieldContext_Izposoja_username(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Izposoja", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_VraciloKolesa_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteIzposoja(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteIzposoja(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteIzposoja(rctx, fc.Args["input"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteIzposoja(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteIzposoja_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1846,6 +2861,161 @@ func (ec *executionContext) fieldContext_Query_postajalisca(ctx context.Context,
 				return ec.fieldContext_Postajalisce_kolesaArray(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Postajalisce", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_izposoja(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_izposoja(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Izposoja(rctx, fc.Args["_id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Izposoja)
+	fc.Result = res
+	return ec.marshalNIzposoja2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposoja(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_izposoja(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_Izposoja__id(ctx, field)
+			case "start_date":
+				return ec.fieldContext_Izposoja_start_date(ctx, field)
+			case "end_date":
+				return ec.fieldContext_Izposoja_end_date(ctx, field)
+			case "start_station_id":
+				return ec.fieldContext_Izposoja_start_station_id(ctx, field)
+			case "end_station_id":
+				return ec.fieldContext_Izposoja_end_station_id(ctx, field)
+			case "bike_id":
+				return ec.fieldContext_Izposoja_bike_id(ctx, field)
+			case "duration":
+				return ec.fieldContext_Izposoja_duration(ctx, field)
+			case "trenutna_zasedenost_start":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_start(ctx, field)
+			case "trenutna_zasedenost_end":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_end(ctx, field)
+			case "weather":
+				return ec.fieldContext_Izposoja_weather(ctx, field)
+			case "start_station":
+				return ec.fieldContext_Izposoja_start_station(ctx, field)
+			case "end_station":
+				return ec.fieldContext_Izposoja_end_station(ctx, field)
+			case "username":
+				return ec.fieldContext_Izposoja_username(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Izposoja", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_izposoja_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_izposoje(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_izposoje(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Izposoje(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Izposoja)
+	fc.Result = res
+	return ec.marshalNIzposoja2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposojaᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_izposoje(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_Izposoja__id(ctx, field)
+			case "start_date":
+				return ec.fieldContext_Izposoja_start_date(ctx, field)
+			case "end_date":
+				return ec.fieldContext_Izposoja_end_date(ctx, field)
+			case "start_station_id":
+				return ec.fieldContext_Izposoja_start_station_id(ctx, field)
+			case "end_station_id":
+				return ec.fieldContext_Izposoja_end_station_id(ctx, field)
+			case "bike_id":
+				return ec.fieldContext_Izposoja_bike_id(ctx, field)
+			case "duration":
+				return ec.fieldContext_Izposoja_duration(ctx, field)
+			case "trenutna_zasedenost_start":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_start(ctx, field)
+			case "trenutna_zasedenost_end":
+				return ec.fieldContext_Izposoja_trenutna_zasedenost_end(ctx, field)
+			case "weather":
+				return ec.fieldContext_Izposoja_weather(ctx, field)
+			case "start_station":
+				return ec.fieldContext_Izposoja_start_station(ctx, field)
+			case "end_station":
+				return ec.fieldContext_Izposoja_end_station(ctx, field)
+			case "username":
+				return ec.fieldContext_Izposoja_username(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Izposoja", field.Name)
 		},
 	}
 	return fc, nil
@@ -3753,6 +4923,89 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputIzposojaKolesa(ctx context.Context, obj interface{}) (model.IzposojaKolesa, error) {
+	var it model.IzposojaKolesa
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"start_date", "start_stationi_id", "bike_id", "trenutna_zasedenost_start", "weather", "start_station", "username"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "start_date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_date"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StartDate = data
+		case "start_stationi_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_stationi_id"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StartStationiID = data
+		case "bike_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bike_id"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BikeID = data
+		case "trenutna_zasedenost_start":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("trenutna_zasedenost_start"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TrenutnaZasedenostStart = data
+		case "weather":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weather"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Weather = data
+		case "start_station":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_station"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StartStation = data
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Username = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewKolo(ctx context.Context, obj interface{}) (model.NewKolo, error) {
 	var it model.NewKolo
 	asMap := map[string]interface{}{}
@@ -3941,6 +5194,71 @@ func (ec *executionContext) unmarshalInputUpdatePostajalisce(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputVraciloKolesa(ctx context.Context, obj interface{}) (model.VraciloKolesa, error) {
+	var it model.VraciloKolesa
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"end_date", "end_station_id", "duration", "trenutna_zasedenost_start", "end_station"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "end_date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_date"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EndDate = data
+		case "end_station_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_station_id"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EndStationID = data
+		case "duration":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duration"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Duration = data
+		case "trenutna_zasedenost_start":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("trenutna_zasedenost_start"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TrenutnaZasedenostStart = data
+		case "end_station":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_station"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EndStation = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3948,6 +5266,93 @@ func (ec *executionContext) unmarshalInputUpdatePostajalisce(ctx context.Context
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var izposojaImplementors = []string{"Izposoja"}
+
+func (ec *executionContext) _Izposoja(ctx context.Context, sel ast.SelectionSet, obj *model.Izposoja) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, izposojaImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Izposoja")
+		case "_id":
+			out.Values[i] = ec._Izposoja__id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "start_date":
+			out.Values[i] = ec._Izposoja_start_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "end_date":
+			out.Values[i] = ec._Izposoja_end_date(ctx, field, obj)
+		case "start_station_id":
+			out.Values[i] = ec._Izposoja_start_station_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "end_station_id":
+			out.Values[i] = ec._Izposoja_end_station_id(ctx, field, obj)
+		case "bike_id":
+			out.Values[i] = ec._Izposoja_bike_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "duration":
+			out.Values[i] = ec._Izposoja_duration(ctx, field, obj)
+		case "trenutna_zasedenost_start":
+			out.Values[i] = ec._Izposoja_trenutna_zasedenost_start(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "trenutna_zasedenost_end":
+			out.Values[i] = ec._Izposoja_trenutna_zasedenost_end(ctx, field, obj)
+		case "weather":
+			out.Values[i] = ec._Izposoja_weather(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "start_station":
+			out.Values[i] = ec._Izposoja_start_station(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "end_station":
+			out.Values[i] = ec._Izposoja_end_station(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "username":
+			out.Values[i] = ec._Izposoja_username(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var koloImplementors = []string{"Kolo"}
 
@@ -4060,6 +5465,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deletePostajalisce":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePostajalisce(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "izposojaKolesa":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_izposojaKolesa(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "VraciloKolesa":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_VraciloKolesa(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteIzposoja":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteIzposoja(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -4290,6 +5716,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_postajalisca(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "izposoja":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_izposoja(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "izposoje":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_izposoje(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4704,6 +6174,84 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) marshalNIzposoja2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposoja(ctx context.Context, sel ast.SelectionSet, v model.Izposoja) graphql.Marshaler {
+	return ec._Izposoja(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNIzposoja2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposojaᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Izposoja) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNIzposoja2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposoja(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNIzposoja2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposoja(ctx context.Context, sel ast.SelectionSet, v *model.Izposoja) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Izposoja(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNIzposojaKolesa2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐIzposojaKolesa(ctx context.Context, v interface{}) (model.IzposojaKolesa, error) {
+	res, err := ec.unmarshalInputIzposojaKolesa(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNKolo2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKolo(ctx context.Context, sel ast.SelectionSet, v model.Kolo) graphql.Marshaler {
 	return ec._Kolo(ctx, sel, &v)
 }
@@ -4916,6 +6464,11 @@ func (ec *executionContext) unmarshalNUpdateKolo2goᚑgraphqlᚑmongodbᚑapiᚋ
 
 func (ec *executionContext) unmarshalNUpdatePostajalisce2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐUpdatePostajalisce(ctx context.Context, v interface{}) (model.UpdatePostajalisce, error) {
 	res, err := ec.unmarshalInputUpdatePostajalisce(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNVraciloKolesa2goᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐVraciloKolesa(ctx context.Context, v interface{}) (model.VraciloKolesa, error) {
+	res, err := ec.unmarshalInputVraciloKolesa(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -5212,6 +6765,22 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	}
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOKolo2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐKolo(ctx context.Context, sel ast.SelectionSet, v *model.Kolo) graphql.Marshaler {

@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"go-graphql-mongodb-api/database"
 	"go-graphql-mongodb-api/graph/model"
 )
@@ -40,6 +41,21 @@ func (r *mutationResolver) DeletePostajalisce(ctx context.Context, input string)
 	return db.DeletePostajalisce(input), nil
 }
 
+// IzposojaKolesa is the resolver for the izposojaKolesa field.
+func (r *mutationResolver) IzposojaKolesa(ctx context.Context, input model.IzposojaKolesa) (*model.Izposoja, error) {
+	panic(fmt.Errorf("not implemented: IzposojaKolesa - izposojaKolesa"))
+}
+
+// VraciloKolesa is the resolver for the VraciloKolesa field.
+func (r *mutationResolver) VraciloKolesa(ctx context.Context, input model.VraciloKolesa) (*model.Izposoja, error) {
+	panic(fmt.Errorf("not implemented: VraciloKolesa - VraciloKolesa"))
+}
+
+// DeleteIzposoja is the resolver for the deleteIzposoja field.
+func (r *mutationResolver) DeleteIzposoja(ctx context.Context, input string) (string, error) {
+	panic(fmt.Errorf("not implemented: DeleteIzposoja - deleteIzposoja"))
+}
+
 // ReserveKolo is the resolver for the reserveKolo field.
 func (r *queryResolver) ReserveKolo(ctx context.Context, id string) (*model.Kolo, error) {
 	return db.ReserveKolo(id, true), nil
@@ -68,6 +84,16 @@ func (r *queryResolver) Postajalisce(ctx context.Context, id string) (*model.Pos
 // Postajalisca is the resolver for the postajalisca field.
 func (r *queryResolver) Postajalisca(ctx context.Context) ([]*model.Postajalisce, error) {
 	return db.FindAllPostajalisce(), nil
+}
+
+// Izposoja is the resolver for the izposoja field.
+func (r *queryResolver) Izposoja(ctx context.Context, id string) (*model.Izposoja, error) {
+	return db.FindIzposoja(id), nil
+}
+
+// Izposoje is the resolver for the izposoje field.
+func (r *queryResolver) Izposoje(ctx context.Context) ([]*model.Izposoja, error) {
+	return db.FindAllIzposoja(), nil
 }
 
 // Mutation returns MutationResolver implementation.

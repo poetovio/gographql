@@ -21,6 +21,7 @@ const (
 	DATABASE     = "projekt"
 	KOLESA       = "kolesa"
 	POSTAJALISCA = "postajalisca"
+	IZPOSOJE     = "izposoje"
 )
 
 func Connect(url string) *DB {
@@ -357,4 +358,62 @@ func (db *DB) FindAllPostajalisce() []*model.Postajalisce {
 	}
 
 	return postajalisca
+}
+
+// function for borrowing a Kolo from Postajalisce
+
+// function for returning a Kolo to Postajalisce
+
+// function for finding an Izposoja in database
+func (db *DB) FindIzposoja(id string) *model.Izposoja {
+	ObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't convert id to ObjectID")
+		log.Fatal(err)
+	}
+
+	izposojaColl := db.client.Database(DATABASE).Collection(IZPOSOJE)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result := izposojaColl.FindOne(ctx, bson.M{"_id": ObjectID})
+
+	izposoja := model.Izposoja{}
+
+	err = result.Decode(&izposoja)
+
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't decode result into Izposoja")
+		log.Fatal(err)
+	}
+
+	return &izposoja
+}
+
+// function for finding all Izposoja in database
+func (db *DB) FindAllIzposoja() []*model.Izposoja {
+	izposojaColl := db.client.Database(DATABASE).Collection(IZPOSOJE)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := izposojaColl.Find(ctx, bson.D{})
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor for Izposoja")
+		log.Fatal(err)
+	}
+
+	var izposoje []*model.Izposoja
+	for cursor.Next(ctx) {
+		var izposoja *model.Izposoja
+		err := cursor.Decode(&izposoja)
+
+		if err != nil {
+			log.Default().Println("ERROR -> couldn't decode result into Izposoja")
+			log.Fatal(err)
+		}
+
+		izposoje = append(izposoje, izposoja)
+	}
+
+	return izposoje
 }
