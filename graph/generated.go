@@ -63,6 +63,7 @@ type ComplexityRoot struct {
 
 	Kolo struct {
 		ID               func(childComplexity int) int
+		JeIzposojen      func(childComplexity int) int
 		Mnenje           func(childComplexity int) int
 		Rezervirano      func(childComplexity int) int
 		SerijskaStevilka func(childComplexity int) int
@@ -235,6 +236,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Kolo.ID(childComplexity), true
+
+	case "Kolo.jeIzposojen":
+		if e.complexity.Kolo.JeIzposojen == nil {
+			break
+		}
+
+		return e.complexity.Kolo.JeIzposojen(childComplexity), true
 
 	case "Kolo.mnenje":
 		if e.complexity.Kolo.Mnenje == nil {
@@ -1618,6 +1626,50 @@ func (ec *executionContext) fieldContext_Kolo_rezervirano(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Kolo_jeIzposojen(ctx context.Context, field graphql.CollectedField, obj *model.Kolo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Kolo_jeIzposojen(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.JeIzposojen, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Kolo_jeIzposojen(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Kolo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createKolo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createKolo(ctx, field)
 	if err != nil {
@@ -1665,6 +1717,8 @@ func (ec *executionContext) fieldContext_Mutation_createKolo(ctx context.Context
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
 			case "rezervirano":
 				return ec.fieldContext_Kolo_rezervirano(ctx, field)
+			case "jeIzposojen":
+				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -1730,6 +1784,8 @@ func (ec *executionContext) fieldContext_Mutation_updateKolo(ctx context.Context
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
 			case "rezervirano":
 				return ec.fieldContext_Kolo_rezervirano(ctx, field)
+			case "jeIzposojen":
+				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -2484,6 +2540,8 @@ func (ec *executionContext) fieldContext_Postajalisce_kolesaArray(ctx context.Co
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
 			case "rezervirano":
 				return ec.fieldContext_Kolo_rezervirano(ctx, field)
+			case "jeIzposojen":
+				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -2538,6 +2596,8 @@ func (ec *executionContext) fieldContext_Query_reserveKolo(ctx context.Context, 
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
 			case "rezervirano":
 				return ec.fieldContext_Kolo_rezervirano(ctx, field)
+			case "jeIzposojen":
+				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -2603,6 +2663,8 @@ func (ec *executionContext) fieldContext_Query_unreserveKolo(ctx context.Context
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
 			case "rezervirano":
 				return ec.fieldContext_Kolo_rezervirano(ctx, field)
+			case "jeIzposojen":
+				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -2668,6 +2730,8 @@ func (ec *executionContext) fieldContext_Query_kolo(ctx context.Context, field g
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
 			case "rezervirano":
 				return ec.fieldContext_Kolo_rezervirano(ctx, field)
+			case "jeIzposojen":
+				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -2733,6 +2797,8 @@ func (ec *executionContext) fieldContext_Query_kolesa(ctx context.Context, field
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
 			case "rezervirano":
 				return ec.fieldContext_Kolo_rezervirano(ctx, field)
+			case "jeIzposojen":
+				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kolo", field.Name)
 		},
@@ -5005,7 +5071,7 @@ func (ec *executionContext) unmarshalInputKoloInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"_id", "serijska_stevilka", "mnenje", "rezervirano"}
+	fieldsInOrder := [...]string{"_id", "serijska_stevilka", "mnenje", "rezervirano", "jeIzposojen"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5048,6 +5114,15 @@ func (ec *executionContext) unmarshalInputKoloInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.Rezervirano = data
+		case "jeIzposojen":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("jeIzposojen"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.JeIzposojen = data
 		}
 	}
 
@@ -5448,6 +5523,11 @@ func (ec *executionContext) _Kolo(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "rezervirano":
 			out.Values[i] = ec._Kolo_rezervirano(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "jeIzposojen":
+			out.Values[i] = ec._Kolo_jeIzposojen(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

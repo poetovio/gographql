@@ -74,7 +74,8 @@ func (db *DB) InsertKolo(kolo model.NewKolo) *model.Kolo {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	inserg, err := koloColl.InsertOne(ctx, bson.D{{Key: "serijska_stevilka", Value: kolo.SerijskaStevilka}, {Key: "mnenje", Value: bson.A{}}})
+	inserg, err := koloColl.InsertOne(ctx, bson.D{{Key: "serijska_stevilka", Value: kolo.SerijskaStevilka}, {Key: "mnenje", Value: bson.A{}},
+		{Key: "rezervirano", Value: false}, {Key: "jeIzposojen", Value: false}})
 
 	if err != nil {
 		log.Default().Println("ERROR -> couldn't insert Kolo into database")
@@ -375,7 +376,7 @@ func (db *DB) BorrowKolo(input model.IzposojaKolesa) *model.Izposoja {
 	updatedKolesaArray := make([]*model.KoloInput, 0)
 	for _, kolo := range postajalisce.KolesaArray {
 		if kolo.ID != input.BikeID {
-			updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano}
+			updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
 			updatedKolesaArray = append(updatedKolesaArray, &updatedKolo)
 		}
 	}
@@ -423,11 +424,11 @@ func (db *DB) ReturnKolo(input model.VraciloKolesa) *model.Izposoja {
 
 	kolo := db.FindKolo(input.BikeID)
 
-	novoKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano}
+	novoKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
 
 	updatedKolesaArray := make([]*model.KoloInput, 0)
 	for _, kolo := range postajalisce.KolesaArray {
-		updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano}
+		updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
 		updatedKolesaArray = append(updatedKolesaArray, &updatedKolo)
 	}
 

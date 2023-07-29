@@ -16,6 +16,7 @@ type Kolo {
   serijska_stevilka: String!
   mnenje: [String]!
   rezervirano: Boolean!
+  jeIzposojen: Boolean!
 }
 
 type Izposoja {
@@ -66,6 +67,7 @@ input KoloInput {
   serijska_stevilka: String!
   mnenje: [String]!
   rezervirano: Boolean!
+  jeIzposojen: Boolean!
 }
 
 input UpdatePostajalisce {

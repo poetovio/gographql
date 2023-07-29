@@ -32,6 +32,7 @@ type Kolo struct {
 	SerijskaStevilka string    `json:"serijska_stevilka" bson:"serijska_stevilka"`
 	Mnenje           []*string `json:"mnenje" bson:"mnenje"`
 	Rezervirano      bool      `json:"rezervirano" bson:"rezervirano"`
+	JeIzposojen      bool      `json:"jeIzposojen" bson:"jeIzposojen"`
 }
 
 type KoloInput struct {
@@ -39,6 +40,7 @@ type KoloInput struct {
 	SerijskaStevilka string    `json:"serijska_stevilka" bson:"serijska_stevilka"`
 	Mnenje           []*string `json:"mnenje" bson:"mnenje"`
 	Rezervirano      bool      `json:"rezervirano" bson:"rezervirano"`
+	JeIzposojen      bool      `json:"jeIzposojen" bson:"jeIzposojen"`
 }
 
 type NewKolo struct {
