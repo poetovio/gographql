@@ -14,7 +14,7 @@ type Postajalisce {
 type Kolo {
   _id: ID!
   serijska_stevilka: String!
-  mnenje: [String]!
+  mnenje: [Int]!
   rezervirano: Boolean!
   jeIzposojen: Boolean!
 }
@@ -33,17 +33,6 @@ type Izposoja {
   start_station: String!
   end_station: String!
   username: String!
-}
-
-type Query {
-  reserveKolo(_id: String!): Kolo!
-  unreserveKolo(_id: String!): Kolo!
-  kolo(_id: String!): Kolo!
-  kolesa: [Kolo!]!
-  postajalisce(_id: String!): Postajalisce!
-  postajalisca: [Postajalisce!]!
-  izposoja(_id: String!): Izposoja!
-  izposoje: [Izposoja!]!
 }
 
 input NewKolo {
@@ -65,7 +54,7 @@ input NewPostajalisce {
 input KoloInput {
   _id: ID!
   serijska_stevilka: String!
-  mnenje: [String]!
+  mnenje: [Int]!
   rezervirano: Boolean!
   jeIzposojen: Boolean!
 }
@@ -95,6 +84,18 @@ input VraciloKolesa {
   end_station_id: String!
   duration: Int!
   end_station: String!
+}
+
+type Query {
+  reserveKolo(_id: String!): Kolo!
+  unreserveKolo(_id: String!): Kolo!
+  kolo(_id: String!): Kolo!
+  kolesa: [Kolo!]!
+  postajalisce(_id: String!): Postajalisce!
+  postajalisca: [Postajalisce!]!
+  izposoja(_id: String!): Izposoja!
+  izposoje: [Izposoja!]!
+  nearestPostajalisce(latitude: Float!, longitude: Float!, stPostaj: Int!): [Postajalisce!]!
 }
 
 type Mutation {

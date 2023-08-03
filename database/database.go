@@ -4,6 +4,8 @@ import (
 	"context"
 	"go-graphql-mongodb-api/graph/model"
 	"log"
+	"math"
+	"sort"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,10 +15,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// type of database
 type DB struct {
 	client *mongo.Client
 }
 
+// type for Postajalisce and the distance to the location of the user
+type Razdalja struct {
+	postajalisce *model.Postajalisce
+	distance     float64
+}
+
+// type of sorted array of Razdalja
+type ByDistance []*Razdalja
+
+// functions for sorting the array
+
+func (a ByDistance) Len() int           { return len(a) }
+func (a ByDistance) Less(i, j int) bool { return a[i].distance < a[j].distance }
+func (a ByDistance) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+// database collection names constants
 const (
 	DATABASE     = "projekt"
 	KOLESA       = "kolesa"
@@ -83,7 +102,7 @@ func (db *DB) InsertKolo(kolo model.NewKolo) *model.Kolo {
 	}
 
 	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
-	returnKolo := model.Kolo{ID: insertedID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: make([]*string, 500)}
+	returnKolo := model.Kolo{ID: insertedID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: make([]*int, 500)}
 
 	return &returnKolo
 }
@@ -217,7 +236,69 @@ func (db *DB) ReserveKolo(id string, reserved bool) *model.Kolo {
 		log.Default().Println("ERROR -> couldn't find Kolo")
 	}
 
+	// write a function that loops postajalisce in postajalisca and in Kolo in kolesaArray find the kolo and update it to the new one
+
+	db.UpdateKoloInPostajalisce(db.FindKolo(id), id)
+
 	return db.FindKolo(id)
+}
+
+// function for updating Kolo in Postajalisce
+func (db *DB) UpdateKoloInPostajalisce(kolo *model.Kolo, id string) {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := postajalisceColl.Find(ctx, bson.D{})
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor on collection Postajalisce")
+		log.Fatal(err)
+	}
+
+	for cursor.Next(context.TODO()) {
+		var postajalisce *model.Postajalisce
+		err := cursor.Decode(&postajalisce)
+
+		if err != nil {
+			log.Default().Println("ERROR -> couldn't decode cursor")
+			log.Fatal(err)
+		}
+
+		for _, kolo := range postajalisce.KolesaArray {
+
+			if kolo.ID == id {
+				*kolo = *db.FindKolo(id)
+
+				updatePostajalisce := model.UpdatePostajalisce{
+					ID:          id,
+					Ime:         &postajalisce.Ime,
+					Naslov:      &postajalisce.Naslov,
+					Latitude:    &postajalisce.Latitude,
+					Longitude:   &postajalisce.Longitude,
+					KolesaArray: make([]*model.KoloInput, 0),
+				}
+
+				for _, koloInput := range postajalisce.KolesaArray {
+
+					insertKolo := model.KoloInput{
+						ID:               koloInput.ID,
+						SerijskaStevilka: koloInput.SerijskaStevilka,
+						Mnenje:           make([]*int, 0),
+						Rezervirano:      koloInput.Rezervirano,
+						JeIzposojen:      kolo.JeIzposojen,
+					}
+
+					for _, mnenje := range koloInput.Mnenje {
+						insertKolo.Mnenje = append(insertKolo.Mnenje, mnenje)
+					}
+
+					updatePostajalisce.KolesaArray = append(updatePostajalisce.KolesaArray, &insertKolo)
+				}
+
+				db.UpdatePostajalisce(updatePostajalisce)
+			}
+		}
+	}
 }
 
 // function for inserting a Postajalisce into database
@@ -363,6 +444,52 @@ func (db *DB) FindAllPostajalisce() []*model.Postajalisce {
 	}
 
 	return postajalisca
+}
+
+// function for finding nearest Postajalisce to a given location
+func (db *DB) FindNearestPostajalisce(latitude float64, longitude float64, stPostajalisc int) []*model.Postajalisce {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := postajalisceColl.Find(ctx, bson.D{})
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor for Postajalisce")
+		log.Fatal(err)
+	}
+
+	var postajalisca []*Razdalja
+	for cursor.Next(ctx) {
+		var postajalisce *model.Postajalisce
+		err := cursor.Decode(&postajalisce)
+
+		if err != nil {
+			log.Default().Println("ERROR -> couldn't decode result into Postajalisce")
+			log.Fatal(err)
+		}
+
+		var razdalja = distance(latitude, longitude, postajalisce.Latitude, postajalisce.Longitude)
+
+		postajalisca = append(postajalisca, &Razdalja{postajalisce, razdalja})
+
+	}
+
+	// Sort the array by distance
+	sort.Sort(ByDistance(postajalisca))
+
+	for _, distance := range postajalisca {
+		log.Default().Println(distance.postajalisce.Ime, distance)
+	}
+
+	var urejenaPostajalisca []*model.Postajalisce
+
+	for i, postajalisce := range postajalisca {
+		if i < stPostajalisc {
+			urejenaPostajalisca = append(urejenaPostajalisca, postajalisce.postajalisce)
+		}
+	}
+
+	return urejenaPostajalisca
 }
 
 // function for borrowing a Kolo from Postajalisce
@@ -535,4 +662,27 @@ func (db *DB) FindAllIzposoja() []*model.Izposoja {
 	}
 
 	return izposoje
+}
+
+// function for calculating distance from location to Postajalisce
+func distance(lat1 float64, lng1 float64, lat2 float64, lng2 float64) float64 {
+	const PI float64 = 3.141592653589793
+
+	radlat1 := float64(PI * lat1 / 180)
+	radlat2 := float64(PI * lat2 / 180)
+
+	theta := float64(lng1 - lng2)
+	radtheta := float64(PI * theta / 180)
+
+	dist := math.Sin(radlat1)*math.Sin(radlat2) + math.Cos(radlat1)*math.Cos(radlat2)*math.Cos(radtheta)
+
+	if dist > 1 {
+		dist = 1
+	}
+
+	dist = math.Acos(dist)
+	dist = dist * 180 / PI
+	dist = dist * 60 * 1.1515
+
+	return dist
 }
