@@ -90,6 +90,11 @@ func (r *queryResolver) Izposoje(ctx context.Context) ([]*model.Izposoja, error)
 	return db.FindAllIzposoja(), nil
 }
 
+// IzposojeForUser is the resolver for the izposojeForUser field.
+func (r *queryResolver) IzposojeForUser(ctx context.Context, username string) ([]*model.Izposoja, error) {
+	return db.FindAllIzposojaByUser(username), nil
+}
+
 // NearestPostajalisce is the resolver for the nearestPostajalisce field.
 func (r *queryResolver) NearestPostajalisce(ctx context.Context, latitude float64, longitude float64, stPostaj int) ([]*model.Postajalisce, error) {
 	return db.FindNearestPostajalisce(latitude, longitude, stPostaj), nil

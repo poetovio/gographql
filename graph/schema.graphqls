@@ -93,6 +93,7 @@ type Query {
   postajalisca: [Postajalisce!]!
   izposoja(_id: String!): Izposoja!
   izposoje: [Izposoja!]!
+  izposojeForUser(username: String!): [Izposoja!]!
   nearestPostajalisce(latitude: Float!, longitude: Float!, stPostaj: Int!): [Postajalisce!]
 }
 

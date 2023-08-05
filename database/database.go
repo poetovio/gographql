@@ -584,6 +584,36 @@ func (db *DB) FindAllIzposoja() []*model.Izposoja {
 	return izposoje
 }
 
+// function for getting all Izposoja for a specific user
+func (db *DB) FindAllIzposojaByUser(username string) []*model.Izposoja {
+	izposojaColl := db.client.Database(DATABASE).Collection(IZPOSOJE)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := izposojaColl.Find(ctx, bson.D{})
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor for Izposoja")
+		log.Fatal(err)
+	}
+
+	var izposoje []*model.Izposoja
+	for cursor.Next(ctx) {
+		var izposoja *model.Izposoja
+		err := cursor.Decode(&izposoja)
+
+		if err != nil {
+			log.Default().Println("ERROR -> couldn't decode result into Izposoja")
+			log.Fatal(err)
+		}
+
+		if izposoja.Username == username {
+			izposoje = append(izposoje, izposoja)
+		}
+	}
+
+	return izposoje
+}
+
 // function for inserting Mnenje into Kolo
 func (db *DB) InsertMnenje(_id string, mnenje int) string {
 	var kolo = db.FindKolo(_id)
