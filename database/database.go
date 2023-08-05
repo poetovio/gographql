@@ -585,19 +585,17 @@ func (db *DB) FindAllIzposoja() []*model.Izposoja {
 }
 
 // function for inserting Mnenje into Kolo
-/*
 func (db *DB) InsertMnenje(_id string, mnenje int) string {
 	var kolo = db.FindKolo(_id)
 
-	kolo.Mnenje = append(kolo.Mnenje, mnenje)
+	kolo.Mnenje = append(kolo.Mnenje, &mnenje)
 
-	var novoKolo = model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
+	var novoKolo = model.UpdateKolo{ID: kolo.ID, Mnenje: kolo.Mnenje}
 
 	db.UpdateKolo(novoKolo)
 
 	return "OK -> successfully inserted Mnenje into Kolo"
 }
-*/
 
 // function for calculating distance from location to Postajalisce
 func distance(lat1 float64, lng1 float64, lat2 float64, lng2 float64) float64 {
