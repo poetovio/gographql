@@ -15,7 +15,6 @@ type Kolo {
   _id: ID!
   serijska_stevilka: String!
   mnenje: [Int]!
-  rezervirano: Boolean!
   jeIzposojen: Boolean!
 }
 
@@ -41,7 +40,8 @@ input NewKolo {
 
 input UpdateKolo {
   _id: ID!
-  serijska_stevilka: String!
+  serijska_stevilka: String
+  mnenje: [Int]
 }
 
 input NewPostajalisce {
@@ -93,7 +93,7 @@ type Query {
   postajalisca: [Postajalisce!]!
   izposoja(_id: String!): Izposoja!
   izposoje: [Izposoja!]!
-  nearestPostajalisce(latitude: Float!, longitude: Float!, stPostaj: Int!): [Postajalisce!]!
+  nearestPostajalisce(latitude: Float!, longitude: Float!, stPostaj: Int!): [Postajalisce!]
 }
 
 type Mutation {
@@ -106,4 +106,5 @@ type Mutation {
   izposojaKolesa(input: IzposojaKolesa!): Izposoja!
   vraciloKolesa(input: VraciloKolesa!): Izposoja!
   deleteIzposoja(input: String!): String!
+  insertMnenje(_id: String!, mnenje: Int!): String!
 }

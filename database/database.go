@@ -122,7 +122,17 @@ func (db *DB) UpdateKolo(kolo model.UpdateKolo) *model.Kolo {
 
 	filer := bson.M{"_id": ObjectID}
 
-	update := bson.M{"$set": bson.M{"serijska_stevilka": kolo.SerijskaStevilka}}
+	updatedKolo := bson.M{}
+
+	if kolo.SerijskaStevilka != nil {
+		updatedKolo["serijska_stevilka"] = kolo.SerijskaStevilka
+	}
+
+	if kolo.Mnenje != nil {
+		updatedKolo["mnenje"] = kolo.Mnenje
+	}
+
+	update := bson.M{"$set": updatedKolo}
 
 	_, err = koloColl.UpdateOne(ctx, filer, update)
 	if err != nil {
@@ -413,7 +423,7 @@ func (db *DB) BorrowKolo(input model.IzposojaKolesa) *model.Izposoja {
 	updatedKolesaArray := make([]*model.KoloInput, 0)
 	for _, kolo := range postajalisce.KolesaArray {
 		if kolo.ID != input.BikeID {
-			updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
+			updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, JeIzposojen: kolo.JeIzposojen}
 			updatedKolesaArray = append(updatedKolesaArray, &updatedKolo)
 		}
 	}
@@ -461,11 +471,11 @@ func (db *DB) ReturnKolo(input model.VraciloKolesa) *model.Izposoja {
 
 	kolo := db.FindKolo(input.BikeID)
 
-	novoKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
+	novoKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, JeIzposojen: kolo.JeIzposojen}
 
 	updatedKolesaArray := make([]*model.KoloInput, 0)
 	for _, kolo := range postajalisce.KolesaArray {
-		updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
+		updatedKolo := model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, JeIzposojen: kolo.JeIzposojen}
 		updatedKolesaArray = append(updatedKolesaArray, &updatedKolo)
 	}
 
@@ -573,6 +583,21 @@ func (db *DB) FindAllIzposoja() []*model.Izposoja {
 
 	return izposoje
 }
+
+// function for inserting Mnenje into Kolo
+/*
+func (db *DB) InsertMnenje(_id string, mnenje int) string {
+	var kolo = db.FindKolo(_id)
+
+	kolo.Mnenje = append(kolo.Mnenje, mnenje)
+
+	var novoKolo = model.KoloInput{ID: kolo.ID, SerijskaStevilka: kolo.SerijskaStevilka, Mnenje: kolo.Mnenje, Rezervirano: kolo.Rezervirano, JeIzposojen: kolo.JeIzposojen}
+
+	db.UpdateKolo(novoKolo)
+
+	return "OK -> successfully inserted Mnenje into Kolo"
+}
+*/
 
 // function for calculating distance from location to Postajalisce
 func distance(lat1 float64, lng1 float64, lat2 float64, lng2 float64) float64 {

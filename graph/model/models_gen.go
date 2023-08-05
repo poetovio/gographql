@@ -64,8 +64,9 @@ type Postajalisce struct {
 }
 
 type UpdateKolo struct {
-	ID               string `json:"_id" bson:"_id"`
-	SerijskaStevilka string `json:"serijska_stevilka" bson:"serijska_stevilka"`
+	ID               string  `json:"_id" bson:"_id"`
+	SerijskaStevilka *string `json:"serijska_stevilka,omitempty" bson:"serijska_stevilka,omitempty"`
+	Mnenje           []*int  `json:"mnenje,omitempty" bson:"mnenje,omitempty"`
 }
 
 type UpdatePostajalisce struct {

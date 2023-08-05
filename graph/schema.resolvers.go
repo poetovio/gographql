@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"go-graphql-mongodb-api/database"
 	"go-graphql-mongodb-api/graph/model"
 )
@@ -53,6 +54,11 @@ func (r *mutationResolver) VraciloKolesa(ctx context.Context, input model.Vracil
 // DeleteIzposoja is the resolver for the deleteIzposoja field.
 func (r *mutationResolver) DeleteIzposoja(ctx context.Context, input string) (string, error) {
 	return db.DeleteIzposoja(input), nil
+}
+
+// InsertMnenje is the resolver for the insertMnenje field.
+func (r *mutationResolver) InsertMnenje(ctx context.Context, id string, mnenje int) (string, error) {
+	panic(fmt.Errorf("not implemented: InsertMnenje - insertMnenje"))
 }
 
 // Kolo is the resolver for the kolo field.

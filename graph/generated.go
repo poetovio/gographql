@@ -65,7 +65,6 @@ type ComplexityRoot struct {
 		ID               func(childComplexity int) int
 		JeIzposojen      func(childComplexity int) int
 		Mnenje           func(childComplexity int) int
-		Rezervirano      func(childComplexity int) int
 		SerijskaStevilka func(childComplexity int) int
 	}
 
@@ -75,6 +74,7 @@ type ComplexityRoot struct {
 		DeleteIzposoja     func(childComplexity int, input string) int
 		DeleteKolo         func(childComplexity int, input string) int
 		DeletePostajalisce func(childComplexity int, input string) int
+		InsertMnenje       func(childComplexity int, id string, mnenje int) int
 		IzposojaKolesa     func(childComplexity int, input model.IzposojaKolesa) int
 		UpdateKolo         func(childComplexity int, input model.UpdateKolo) int
 		UpdatePostajalisce func(childComplexity int, input model.UpdatePostajalisce) int
@@ -111,6 +111,7 @@ type MutationResolver interface {
 	IzposojaKolesa(ctx context.Context, input model.IzposojaKolesa) (*model.Izposoja, error)
 	VraciloKolesa(ctx context.Context, input model.VraciloKolesa) (*model.Izposoja, error)
 	DeleteIzposoja(ctx context.Context, input string) (string, error)
+	InsertMnenje(ctx context.Context, id string, mnenje int) (string, error)
 }
 type QueryResolver interface {
 	Kolo(ctx context.Context, id string) (*model.Kolo, error)
@@ -249,13 +250,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Kolo.Mnenje(childComplexity), true
 
-	case "Kolo.rezervirano":
-		if e.complexity.Kolo.Rezervirano == nil {
-			break
-		}
-
-		return e.complexity.Kolo.Rezervirano(childComplexity), true
-
 	case "Kolo.serijska_stevilka":
 		if e.complexity.Kolo.SerijskaStevilka == nil {
 			break
@@ -322,6 +316,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeletePostajalisce(childComplexity, args["input"].(string)), true
+
+	case "Mutation.insertMnenje":
+		if e.complexity.Mutation.InsertMnenje == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertMnenje_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InsertMnenje(childComplexity, args["_id"].(string), args["mnenje"].(int)), true
 
 	case "Mutation.izposojaKolesa":
 		if e.complexity.Mutation.IzposojaKolesa == nil {
@@ -685,6 +691,30 @@ func (ec *executionContext) field_Mutation_deletePostajalisce_args(ctx context.C
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_insertMnenje_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["_id"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["mnenje"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mnenje"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["mnenje"] = arg1
 	return args, nil
 }
 
@@ -1571,50 +1601,6 @@ func (ec *executionContext) fieldContext_Kolo_mnenje(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Kolo_rezervirano(ctx context.Context, field graphql.CollectedField, obj *model.Kolo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Kolo_rezervirano(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Rezervirano, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Kolo_rezervirano(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Kolo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Kolo_jeIzposojen(ctx context.Context, field graphql.CollectedField, obj *model.Kolo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 	if err != nil {
@@ -1704,8 +1690,6 @@ func (ec *executionContext) fieldContext_Mutation_createKolo(ctx context.Context
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
-			case "rezervirano":
-				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			case "jeIzposojen":
 				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
@@ -1771,8 +1755,6 @@ func (ec *executionContext) fieldContext_Mutation_updateKolo(ctx context.Context
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
-			case "rezervirano":
-				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			case "jeIzposojen":
 				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
@@ -2262,6 +2244,61 @@ func (ec *executionContext) fieldContext_Mutation_deleteIzposoja(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_insertMnenje(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_insertMnenje(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InsertMnenje(rctx, fc.Args["_id"].(string), fc.Args["mnenje"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_insertMnenje(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_insertMnenje_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Postajalisce__id(ctx context.Context, field graphql.CollectedField, obj *model.Postajalisce) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Postajalisce__id(ctx, field)
 	if err != nil {
@@ -2527,8 +2564,6 @@ func (ec *executionContext) fieldContext_Postajalisce_kolesaArray(ctx context.Co
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
-			case "rezervirano":
-				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			case "jeIzposojen":
 				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
@@ -2583,8 +2618,6 @@ func (ec *executionContext) fieldContext_Query_kolo(ctx context.Context, field g
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
-			case "rezervirano":
-				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			case "jeIzposojen":
 				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
@@ -2650,8 +2683,6 @@ func (ec *executionContext) fieldContext_Query_kolesa(ctx context.Context, field
 				return ec.fieldContext_Kolo_serijska_stevilka(ctx, field)
 			case "mnenje":
 				return ec.fieldContext_Kolo_mnenje(ctx, field)
-			case "rezervirano":
-				return ec.fieldContext_Kolo_rezervirano(ctx, field)
 			case "jeIzposojen":
 				return ec.fieldContext_Kolo_jeIzposojen(ctx, field)
 			}
@@ -2964,14 +2995,11 @@ func (ec *executionContext) _Query_nearestPostajalisce(ctx context.Context, fiel
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.Postajalisce)
 	fc.Result = res
-	return ec.marshalNPostajalisce2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐPostajalisceᚄ(ctx, field.Selections, res)
+	return ec.marshalOPostajalisce2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐPostajalisceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_nearestPostajalisce(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5145,7 +5173,7 @@ func (ec *executionContext) unmarshalInputUpdateKolo(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"_id", "serijska_stevilka"}
+	fieldsInOrder := [...]string{"_id", "serijska_stevilka", "mnenje"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5165,11 +5193,20 @@ func (ec *executionContext) unmarshalInputUpdateKolo(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serijska_stevilka"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.SerijskaStevilka = data
+		case "mnenje":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mnenje"))
+			data, err := ec.unmarshalOInt2ᚕᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Mnenje = data
 		}
 	}
 
@@ -5445,11 +5482,6 @@ func (ec *executionContext) _Kolo(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "rezervirano":
-			out.Values[i] = ec._Kolo_rezervirano(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "jeIzposojen":
 			out.Values[i] = ec._Kolo_jeIzposojen(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -5556,6 +5588,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteIzposoja":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteIzposoja(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "insertMnenje":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_insertMnenje(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -5808,9 +5847,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_nearestPostajalisce(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -6815,6 +6851,38 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) unmarshalOInt2ᚕᚖint(ctx context.Context, v interface{}) ([]*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOInt2ᚖint(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOInt2ᚕᚖint(ctx context.Context, sel ast.SelectionSet, v []*int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOInt2ᚖint(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
 	if v == nil {
 		return nil, nil
@@ -6864,6 +6932,53 @@ func (ec *executionContext) unmarshalOKoloInput2ᚖgoᚑgraphqlᚑmongodbᚑapi�
 	}
 	res, err := ec.unmarshalInputKoloInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPostajalisce2ᚕᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐPostajalisceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Postajalisce) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPostajalisce2ᚖgoᚑgraphqlᚑmongodbᚑapiᚋgraphᚋmodelᚐPostajalisce(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
