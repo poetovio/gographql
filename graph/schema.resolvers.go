@@ -55,16 +55,6 @@ func (r *mutationResolver) DeleteIzposoja(ctx context.Context, input string) (st
 	return db.DeleteIzposoja(input), nil
 }
 
-// ReserveKolo is the resolver for the reserveKolo field.
-func (r *queryResolver) ReserveKolo(ctx context.Context, id string) (*model.Kolo, error) {
-	return db.ReserveKolo(id, true), nil
-}
-
-// UnreserveKolo is the resolver for the unreserveKolo field.
-func (r *queryResolver) UnreserveKolo(ctx context.Context, id string) (*model.Kolo, error) {
-	return db.ReserveKolo(id, false), nil
-}
-
 // Kolo is the resolver for the kolo field.
 func (r *queryResolver) Kolo(ctx context.Context, id string) (*model.Kolo, error) {
 	return db.FindKolo(id), nil

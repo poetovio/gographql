@@ -87,8 +87,6 @@ input VraciloKolesa {
 }
 
 type Query {
-  reserveKolo(_id: String!): Kolo!
-  unreserveKolo(_id: String!): Kolo!
   kolo(_id: String!): Kolo!
   kolesa: [Kolo!]!
   postajalisce(_id: String!): Postajalisce!
