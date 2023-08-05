@@ -55,7 +55,6 @@ input KoloInput {
   _id: ID!
   serijska_stevilka: String!
   mnenje: [Int]!
-  rezervirano: Boolean!
   jeIzposojen: Boolean!
 }
 

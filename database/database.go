@@ -120,7 +120,7 @@ func (db *DB) UpdateKolo(kolo model.UpdateKolo) *model.Kolo {
 		log.Fatal()
 	}
 
-	filer := bson.M{"_id": ObjectID}
+	filter := bson.M{"_id": ObjectID}
 
 	updatedKolo := bson.M{}
 
@@ -134,10 +134,23 @@ func (db *DB) UpdateKolo(kolo model.UpdateKolo) *model.Kolo {
 
 	update := bson.M{"$set": updatedKolo}
 
-	_, err = koloColl.UpdateOne(ctx, filer, update)
+	_, err = koloColl.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Default().Println("ERROR -> couldn't update Kolo in database")
 		log.Fatal(err)
+	}
+
+	var novoKolo = db.FindKolo(kolo.ID)
+
+	if novoKolo.JeIzposojen != true {
+		var posodobljenoKolo = model.KoloInput{
+			ID:               kolo.ID,
+			SerijskaStevilka: novoKolo.SerijskaStevilka,
+			Mnenje:           novoKolo.Mnenje,
+			JeIzposojen:      novoKolo.JeIzposojen,
+		}
+
+		db.UpdateKoloInPostajalisce(kolo.ID, &posodobljenoKolo)
 	}
 
 	return db.FindKolo(kolo.ID)
@@ -625,6 +638,64 @@ func (db *DB) InsertMnenje(_id string, mnenje int) string {
 	db.UpdateKolo(novoKolo)
 
 	return "OK -> successfully inserted Mnenje into Kolo"
+}
+
+// function for updating the necessary Kolo in Postajalisce
+func (db *DB) UpdateKoloInPostajalisce(id string, picikl *model.KoloInput) {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := postajalisceColl.Find(ctx, bson.D{})
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor for Postajalisce")
+		log.Fatal(err)
+	}
+
+	var kolesa []*model.Kolo
+	var postajalisceID string
+	for cursor.Next(ctx) {
+		var postajalisce *model.Postajalisce
+		err := cursor.Decode(&postajalisce)
+
+		if err != nil {
+			log.Default().Println("ERROR -> couldn't decode result into Postajalisce")
+			log.Fatal(err)
+		}
+
+		for _, kolo := range postajalisce.KolesaArray {
+			if kolo.ID == id {
+				postajalisceID = postajalisce.ID
+				kolesa = postajalisce.KolesaArray
+			}
+		}
+	}
+
+	var updatedKolesa []*model.KoloInput
+
+	for _, kolo := range kolesa {
+		if kolo.ID != id {
+			var picikl = model.KoloInput{
+				ID:               kolo.ID,
+				SerijskaStevilka: kolo.SerijskaStevilka,
+				Mnenje:           kolo.Mnenje,
+				JeIzposojen:      kolo.JeIzposojen,
+			}
+
+			updatedKolesa = append(updatedKolesa, &picikl)
+		}
+	}
+
+	log.Default().Println(postajalisceID)
+
+	updatedKolesa = append(updatedKolesa, picikl)
+
+	updatedPostajalisce := model.UpdatePostajalisce{
+		ID:          postajalisceID,
+		KolesaArray: updatedKolesa,
+	}
+
+	db.UpdatePostajalisce(updatedPostajalisce)
 }
 
 // function for calculating distance from location to Postajalisce

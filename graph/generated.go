@@ -5135,7 +5135,7 @@ func (ec *executionContext) unmarshalInputKoloInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"_id", "serijska_stevilka", "mnenje", "rezervirano", "jeIzposojen"}
+	fieldsInOrder := [...]string{"_id", "serijska_stevilka", "mnenje", "jeIzposojen"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5169,15 +5169,6 @@ func (ec *executionContext) unmarshalInputKoloInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.Mnenje = data
-		case "rezervirano":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rezervirano"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Rezervirano = data
 		case "jeIzposojen":
 			var err error
 
