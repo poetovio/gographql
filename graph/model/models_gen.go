@@ -19,12 +19,9 @@ type Izposoja struct {
 }
 
 type IzposojaKolesa struct {
-	StartDate      string `json:"start_date" bson:"start_date"`
-	StartStationID string `json:"start_station_id" bson:"start_station_id"`
-	BikeID         string `json:"bike_id" bson:"bike_id"`
-	Weather        string `json:"weather" bson:"weather"`
-	StartStation   string `json:"start_station" bson:"start_station"`
-	Username       string `json:"username" bson:"username"`
+	BikeID   string `json:"bike_id" bson:"bike_id"`
+	Weather  string `json:"weather" bson:"weather"`
+	Username string `json:"username" bson:"username"`
 }
 
 type Kolo struct {

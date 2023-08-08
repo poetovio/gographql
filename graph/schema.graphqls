@@ -68,11 +68,8 @@ input UpdatePostajalisce {
 }
 
 input IzposojaKolesa {
-  start_date: String!
-  start_station_id: String!
   bike_id: String!
   weather: String!
-  start_station: String!
   username: String!
 }
 

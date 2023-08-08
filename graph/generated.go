@@ -5061,31 +5061,13 @@ func (ec *executionContext) unmarshalInputIzposojaKolesa(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"start_date", "start_station_id", "bike_id", "weather", "start_station", "username"}
+	fieldsInOrder := [...]string{"bike_id", "weather", "username"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "start_date":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_date"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.StartDate = data
-		case "start_station_id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_station_id"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.StartStationID = data
 		case "bike_id":
 			var err error
 
@@ -5104,15 +5086,6 @@ func (ec *executionContext) unmarshalInputIzposojaKolesa(ctx context.Context, ob
 				return it, err
 			}
 			it.Weather = data
-		case "start_station":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_station"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.StartStation = data
 		case "username":
 			var err error
 

@@ -425,13 +425,47 @@ func (db *DB) FindNearestPostajalisce(latitude float64, longitude float64, stPos
 	return urejenaPostajalisca
 }
 
+// function for getting Postajalisce, in which the Kolo is stored
+func (db *DB) GetPostajalisceFromKolo(id string) *model.Postajalisce {
+	postajalisceColl := db.client.Database(DATABASE).Collection(POSTAJALISCA)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := postajalisceColl.Find(ctx, bson.D{})
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't create cursor for Postajalisce")
+		log.Fatal(err)
+	}
+
+	for cursor.Next(ctx) {
+		var postajalisce *model.Postajalisce
+		err := cursor.Decode(&postajalisce)
+
+		if err != nil {
+			log.Default().Println("ERROR -> couldn't decode result into Postajalisce")
+			log.Fatal(err)
+		}
+
+		for _, kolo := range postajalisce.KolesaArray {
+			if kolo.ID == id {
+				return db.FindPostajalisce(postajalisce.ID)
+			}
+		}
+	}
+
+	return nil
+}
+
 // function for borrowing a Kolo from Postajalisce
 func (db *DB) BorrowKolo(input model.IzposojaKolesa) *model.Izposoja {
 	izposojeColl := db.client.Database(DATABASE).Collection(IZPOSOJE)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	postajalisce := db.FindPostajalisce(input.StartStationID)
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("2006-01-02 15:04:05")
+
+	postajalisce := db.GetPostajalisceFromKolo(input.BikeID)
 
 	updatedKolesaArray := make([]*model.KoloInput, 0)
 	for _, kolo := range postajalisce.KolesaArray {
@@ -452,8 +486,8 @@ func (db *DB) BorrowKolo(input model.IzposojaKolesa) *model.Izposoja {
 
 	db.UpdatePostajalisce(updatedPostajalisce)
 
-	inserg, err := izposojeColl.InsertOne(ctx, bson.D{{Key: "start_date", Value: input.StartDate}, {Key: "start_station_id", Value: input.StartStationID},
-		{Key: "bike_id", Value: input.BikeID}, {Key: "trenutna_zasedenost_start", Value: len(postajalisce.KolesaArray)}, {Key: "weather", Value: input.Weather}, {Key: "start_station", Value: input.StartStation},
+	inserg, err := izposojeColl.InsertOne(ctx, bson.D{{Key: "start_date", Value: formattedTime}, {Key: "start_station_id", Value: postajalisce.ID},
+		{Key: "bike_id", Value: input.BikeID}, {Key: "trenutna_zasedenost_start", Value: len(postajalisce.KolesaArray)}, {Key: "weather", Value: input.Weather}, {Key: "start_station", Value: postajalisce.Ime},
 		{Key: "username", Value: input.Username}})
 
 	if err != nil {
@@ -462,8 +496,8 @@ func (db *DB) BorrowKolo(input model.IzposojaKolesa) *model.Izposoja {
 	}
 
 	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
-	returnIzposoja := model.Izposoja{ID: insertedID, StartDate: input.StartDate, StartStationID: input.StartStationID, BikeID: input.BikeID, Weather: input.Weather, Username: input.Username,
-		TrenutnaZasedenostStart: len(postajalisce.KolesaArray), StartStation: input.StartStation}
+	returnIzposoja := model.Izposoja{ID: insertedID, StartDate: formattedTime, StartStationID: postajalisce.ID, BikeID: input.BikeID, Weather: input.Weather, Username: input.Username,
+		TrenutnaZasedenostStart: len(postajalisce.KolesaArray), StartStation: postajalisce.Ime}
 
 	return &returnIzposoja
 }
