@@ -40,7 +40,7 @@ type KoloInput struct {
 }
 
 type NewKolo struct {
-	SerijskaStevilka string `json:"serijska_stevilka" bson:"serijska_stevilka"`
+	SerijskaStevilka string `json:"serijska_stevilka"`
 }
 
 type NewPostajalisce struct {
@@ -77,8 +77,6 @@ type UpdatePostajalisce struct {
 type VraciloKolesa struct {
 	ID           string `json:"_id" bson:"_id"`
 	BikeID       string `json:"bike_id" bson:"bike_id"`
-	EndDate      string `json:"end_date" bson:"end_date"`
 	EndStationID string `json:"end_station_id" bson:"end_station_id"`
-	Duration     int    `json:"duration" bson:"duration"`
 	EndStation   string `json:"end_station" bson:"end_station"`
 }

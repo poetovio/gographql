@@ -514,6 +514,21 @@ func (db *DB) ReturnKolo(input model.VraciloKolesa) *model.Izposoja {
 		log.Fatal(err)
 	}
 
+	trenutniCas := time.Now()
+	formattedTime := trenutniCas.Format("2006-01-02 15:04:05")
+
+	currentTimeUnix := time.Now().Unix()
+
+	borrow := db.FindIzposoja(input.ID)
+
+	parsedTime, err := time.Parse("2006-01-02 15:04:05", borrow.StartDate)
+	if err != nil {
+		log.Default().Println("ERROR -> couldn't parse formatted time")
+		log.Fatal(err)
+	}
+
+	trajanje := parsedTime.Unix() - currentTimeUnix
+
 	postajalisce := db.FindPostajalisce(input.EndStationID)
 
 	kolo := db.FindKolo(input.BikeID)
@@ -541,8 +556,8 @@ func (db *DB) ReturnKolo(input model.VraciloKolesa) *model.Izposoja {
 
 	filter := bson.M{"_id": ObjectID}
 
-	update := bson.M{"$set": bson.M{"end_date": input.EndDate, "end_station_id": input.EndStationID, "trenutna_zasedenost_end": len(postajalisce.KolesaArray),
-		"end_station": input.EndStation, "duration": input.Duration}}
+	update := bson.M{"$set": bson.M{"end_date": formattedTime, "end_station_id": input.EndStationID, "trenutna_zasedenost_end": len(postajalisce.KolesaArray),
+		"end_station": input.EndStation, "duration": trajanje}}
 
 	_, err = izposojeColl.UpdateOne(ctx, filter, update)
 	if err != nil {

@@ -5370,7 +5370,7 @@ func (ec *executionContext) unmarshalInputVraciloKolesa(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"_id", "bike_id", "end_date", "end_station_id", "duration", "end_station"}
+	fieldsInOrder := [...]string{"_id", "bike_id", "end_station_id", "end_station"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5395,15 +5395,6 @@ func (ec *executionContext) unmarshalInputVraciloKolesa(ctx context.Context, obj
 				return it, err
 			}
 			it.BikeID = data
-		case "end_date":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_date"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.EndDate = data
 		case "end_station_id":
 			var err error
 
@@ -5413,15 +5404,6 @@ func (ec *executionContext) unmarshalInputVraciloKolesa(ctx context.Context, obj
 				return it, err
 			}
 			it.EndStationID = data
-		case "duration":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duration"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Duration = data
 		case "end_station":
 			var err error
 

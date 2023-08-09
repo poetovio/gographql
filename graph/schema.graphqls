@@ -76,9 +76,7 @@ input IzposojaKolesa {
 input VraciloKolesa {
   _id: ID!
   bike_id: String!
-  end_date: String!
   end_station_id: String!
-  duration: Int!
   end_station: String!
 }
 
