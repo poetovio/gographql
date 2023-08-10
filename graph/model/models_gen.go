@@ -2,6 +2,20 @@
 
 package model
 
+type ChangeKolo struct {
+	ID               string  `json:"_id" bson:"_id"`
+	SerijskaStevilka *string `json:"serijska_stevilka,omitempty" bson:"serijska_stevilka,omitempty"`
+	Mnenje           []*int  `json:"mnenje,omitempty" bson:"mnenje,omitempty"`
+}
+
+type ChangePostajalisce struct {
+	ID        string   `json:"_id" bson:"_id"`
+	Ime       *string  `json:"ime,omitempty" bson:"ime,omitempty"`
+	Naslov    *string  `json:"naslov,omitempty" bson:"naslov,omitempty"`
+	Latitude  *float64 `json:"latitude,omitempty" bson:"latitude,omitempty"`
+	Longitude *float64 `json:"longitude,omitempty" bson:"longitude,omitempty"`
+}
+
 type Izposoja struct {
 	ID                      string  `json:"_id" bson:"_id"`
 	StartDate               string  `json:"start_date" bson:"start_date"`

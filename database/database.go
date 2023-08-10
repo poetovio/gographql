@@ -702,7 +702,7 @@ func (db *DB) UpdateKoloInPostajalisce(id string, picikl *model.KoloInput) {
 	}
 
 	var kolesa []*model.Kolo
-	var postajalisceID string
+	var postajalisceID = ""
 	for cursor.Next(ctx) {
 		var postajalisce *model.Postajalisce
 		err := cursor.Decode(&postajalisce)
@@ -720,31 +720,63 @@ func (db *DB) UpdateKoloInPostajalisce(id string, picikl *model.KoloInput) {
 		}
 	}
 
-	var updatedKolesa []*model.KoloInput
+	if postajalisceID != "" {
+		var updatedKolesa []*model.KoloInput
 
-	for _, kolo := range kolesa {
-		if kolo.ID != id {
-			var picikl = model.KoloInput{
-				ID:               kolo.ID,
-				SerijskaStevilka: kolo.SerijskaStevilka,
-				Mnenje:           kolo.Mnenje,
-				JeIzposojen:      kolo.JeIzposojen,
+		for _, kolo := range kolesa {
+			if kolo.ID != id {
+				var picikl = model.KoloInput{
+					ID:               kolo.ID,
+					SerijskaStevilka: kolo.SerijskaStevilka,
+					Mnenje:           kolo.Mnenje,
+					JeIzposojen:      kolo.JeIzposojen,
+				}
+
+				updatedKolesa = append(updatedKolesa, &picikl)
 			}
-
-			updatedKolesa = append(updatedKolesa, &picikl)
 		}
+
+		updatedKolesa = append(updatedKolesa, picikl)
+
+		updatedPostajalisce := model.UpdatePostajalisce{
+			ID:          postajalisceID,
+			KolesaArray: updatedKolesa,
+		}
+
+		db.UpdatePostajalisce(updatedPostajalisce)
+	}
+}
+
+// function for updating postajalisce from admin console
+func (db *DB) UpdatePostajalisceAdmin(postajalisce model.ChangePostajalisce) string {
+	postaja := db.FindPostajalisce(postajalisce.ID)
+
+	postajajalisce := model.UpdatePostajalisce{
+		ID:        postaja.ID,
+		Ime:       postajalisce.Ime,
+		Naslov:    postajalisce.Naslov,
+		Latitude:  postajalisce.Latitude,
+		Longitude: postajalisce.Longitude,
 	}
 
-	log.Default().Println(postajalisceID)
+	db.UpdatePostajalisce(postajajalisce)
 
-	updatedKolesa = append(updatedKolesa, picikl)
+	return "OK"
+}
 
-	updatedPostajalisce := model.UpdatePostajalisce{
-		ID:          postajalisceID,
-		KolesaArray: updatedKolesa,
+// function for updating kolo from admin console
+func (db *DB) UpdateKoloAdmin(kolo model.ChangeKolo) string {
+
+	picikl := db.FindKolo(kolo.ID)
+
+	koloUpdate := model.UpdateKolo{
+		ID:               picikl.ID,
+		SerijskaStevilka: kolo.SerijskaStevilka,
 	}
 
-	db.UpdatePostajalisce(updatedPostajalisce)
+	db.UpdateKolo(koloUpdate)
+
+	return "OK"
 }
 
 // function for calculating distance from location to Postajalisce

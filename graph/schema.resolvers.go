@@ -60,6 +60,16 @@ func (r *mutationResolver) InsertMnenje(ctx context.Context, id string, mnenje i
 	return db.InsertMnenje(id, mnenje), nil
 }
 
+// ChangeKolo is the resolver for the changeKolo field.
+func (r *mutationResolver) ChangeKolo(ctx context.Context, input model.ChangeKolo) (string, error) {
+	return db.UpdateKoloAdmin(input), nil
+}
+
+// ChangePostajalisce is the resolver for the changePostajalisce field.
+func (r *mutationResolver) ChangePostajalisce(ctx context.Context, input model.ChangePostajalisce) (string, error) {
+	return db.UpdatePostajalisceAdmin(input), nil
+}
+
 // Kolo is the resolver for the kolo field.
 func (r *queryResolver) Kolo(ctx context.Context, id string) (*model.Kolo, error) {
 	return db.FindKolo(id), nil

@@ -80,6 +80,20 @@ input VraciloKolesa {
   end_station: String!
 }
 
+input ChangeKolo {
+  _id: String!
+  serijska_stevilka: String
+  mnenje: [Int]
+}
+
+input ChangePostajalisce {
+  _id: String!
+  ime: String
+  naslov: String
+  latitude: Float
+  longitude: Float
+}
+
 type Query {
   kolo(_id: String!): Kolo!
   kolesa: [Kolo!]!
@@ -102,4 +116,6 @@ type Mutation {
   vraciloKolesa(input: VraciloKolesa!): Izposoja!
   deleteIzposoja(input: String!): String!
   insertMnenje(_id: String!, mnenje: Int!): String!
+  changeKolo(input: ChangeKolo!): String!
+  changePostajalisce(input: ChangePostajalisce!): String!
 }
